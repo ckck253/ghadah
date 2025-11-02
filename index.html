@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Coding Class — Princess Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fff7fb;
+    --card:#fff;
+    --soft:#ffd6e8;
+    --accent:#ff66b3;
+    --accent-dark:#ff4d9a;
+    --muted:#8a94a6;
+    --glow: 0 8px 30px rgba(255,102,179,0.12);
+    --round:16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family: 'Quicksand', system-ui, -apple-system, 'Segoe UI', Roboto, 'Fira Code', monospace;
+    background: linear-gradient(180deg,#fff0f9 0%, #fff7fb 60%);
+    color:#342533;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:22px;
+  }
+
+  .card-shell{
+    width:100%;
+    max-width:920px;
+    border-radius:22px;
+    background: linear-gradient(180deg,#fff,#fff3fb);
+    box-shadow: var(--glow);
+    padding:18px;
+    border: 1px solid rgba(255,77,154,0.06);
+  }
+
+  header{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 6px;
+  }
+
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .logo{
+    width:64px;height:64px;border-radius:14px;
+    background:linear-gradient(135deg, #fff0f6, #ffd6ec);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 20px rgba(255,102,179,0.12);
+    font-size:28px;
+  }
+  .brand h1{margin:0;font-size:20px;color:var(--accent-dark);letter-spacing:0.6px}
+  .brand p{margin:0;font-size:12px;color:var(--muted)}
+
+  .controls{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+
+  .role-badge{
+    background:linear-gradient(90deg,#ffb7da,#ffd6ec);
+    padding:8px 12px;border-radius:999px;font-weight:700;color:#6b0d2d;
+    box-shadow:0 6px 18px rgba(255,77,154,0.08);
+    font-size:13px;
+  }
+
+  .greeting{
+    display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:13px;
+  }
+  .greeting .name{font-weight:700;color:#66223a;font-size:15px}
+  .avatar{
+    width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#fff2f8,#ffe6f5);
+    display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 6px 18px rgba(255,102,179,0.08);
+  }
+
+  main{display:grid;grid-template-columns:2fr 1fr;gap:18px;padding:10px 6px}
+
+  /* Left column (student / admin content) */
+  .panel{
+    background:var(--card);
+    border-radius:14px;
+    padding:14px;
+    box-shadow:0 8px 24px rgba(255,102,179,0.06);
+    border:1px solid rgba(255,77,154,0.04);
+  }
+
+  .panel h2{margin:0;font-size:16px;color:#6b122f}
+  .sub-muted{color:var(--muted);font-size:13px;margin-top:6px}
+
+  .top-actions{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+  .btn{
+    border:0;padding:10px 12px;border-radius:12px;background:linear-gradient(180deg,var(--accent),var(--accent-dark));
+    color:white;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(255,77,154,0.12);
+  }
+  .btn.ghost{background:transparent;color:var(--accent-dark);border:1px dashed rgba(255,77,154,0.12);box-shadow:none;}
+
+  .small{
+    font-size:12px;color:var(--muted)
+  }
+
+  /* Homework list style */
+  .hw-list{margin-top:12px;display:flex;flex-direction:column;gap:10px;max-height:300px;overflow:auto;padding-right:6px}
+  .hw{
+    display:flex;flex-direction:column;padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff8fb,#fff0f6);
+    border:1px solid rgba(255,77,154,0.06);
+  }
+  .hw .title{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .hw .title h3{margin:0;font-size:15px;color:#7a1030}
+  .hw .desc{margin-top:8px;color:#6b2a3f;font-size:14px;white-space:pre-wrap}
+  .hw .meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+  .due{font-size:13px;color:#a14a6f}
+  .days-left{font-weight:700;color:#ff3b8f;background:linear-gradient(90deg,#fff0f6,#ffd6ec);padding:6px 8px;border-radius:999px;font-size:12px}
+
+  /* Admin list controls */
+  .admin-controls{display:flex;gap:8px}
+  .tiny{padding:6px 8px;border-radius:8px;font-size:13px;border:0;cursor:pointer}
+  .edit{background:linear-gradient(90deg,#ffd6ec,#fff0f6);color:#7a1030;border:1px solid rgba(122,16,48,0.06)}
+  .del{background:linear-gradient(90deg,#ffe6ea,#ffdce8);color:#a1223f;border:1px solid rgba(161,34,63,0.05)}
+
+  /* Right column (stats, admin form) */
+  .stats{display:flex;flex-direction:column;gap:12px}
+  .stat-card{background:linear-gradient(180deg,#fff,#fff7f9);padding:12px;border-radius:12px;border:1px solid rgba(255,77,154,0.04)}
+  .stat-card h4{margin:0;color:#7a1030}
+  .stat-card p{margin:6px 0 0;color:var(--muted);font-size:13px}
+
+  /* Admin form */
+  .form-row{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  input[type="text"], textarea, input[type="date"]{
+    padding:10px;border-radius:10px;border:1px solid rgba(122,16,48,0.06);font-family:inherit;
+  }
+  textarea{min-height:80px;resize:none}
+
+  /* badge */
+  .badge{
+    display:inline-block;padding:6px 8px;border-radius:999px;background:#ffecf6;color:#a1223f;font-weight:700;font-size:12px;
+    box-shadow:0 6px 16px rgba(255,102,179,0.06)
+  }
+
+  /* notification dot */
+  .notif {
+    position:relative;
+  }
+  .notif .dot {
+    position:absolute;right:-6px;top:-6px;background:#ff2d6f;width:16px;height:16px;border-radius:999px;color:white;font-size:11px;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 12px rgba(255,45,111,0.12)
+  }
+
+  /* confetti canvas full screen */
+  canvas.confetti-canvas{position:fixed;left:0;top:0;pointer-events:none;width:100%;height:100%;z-index:9999}
+
+  /* small responsive */
+  @media (max-width:880px){
+    main{grid-template-columns:1fr;gap:12px}
+    .brand h1{font-size:18px}
+  }
+</style>
+</head>
+<body>
+<div class="card-shell">
+
+  <header>
+    <div class="brand">
+      <div class="logo">💖</div>
+      <div>
+        <h1>Coding Class — Princess Edition</h1>
+        <p class="small">Happy learning for little stars ✨</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="role-badge" id="roleBadge">Student</div>
+      <div class="greeting">
+        <div class="name">Hello, <span id="displayName">Princess</span>! 👑</div>
+        <div class="small" id="emailView">guest@example.com</div>
+      </div>
+      <div class="avatar" id="avatar">🦄</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- LEFT: Student view / Admin content -->
+    <section class="panel" id="leftPanel">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h2 id="panelTitle">Welcome</h2>
+          <div class="sub-muted" id="panelSubtitle">Your magical dashboard</div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn" id="zoomBtn">Join Zoom ✨</button>
+          <div class="notif" style="margin-left:8px">
+            <button class="btn ghost" id="homeworkNotifBtn">Homeworks</button>
+            <div class="dot" id="hwDot" style="display:none">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="sub-muted">Class schedule: <strong>Mon 8:30 PM (Lebanon)</strong></div>
+      </div>
+
+      <!-- STUDENT HOMEWORK LIST (A: below zoom) -->
+      <h3 style="margin-top:14px;color:#a1223f">Homework <span style="font-size:13px;color:var(--muted)">(read-only)</span></h3>
+      <div class="hw-list" id="homework-list-student">
+        <!-- Filled by JS -->
+      </div>
+
+      <!-- Student local log & achievements -->
+      <div style="margin-top:12px;">
+        <h4 style="margin:0;color:#7a1030">Activity</h4>
+        <div class="sub-muted">Recent events</div>
+        <div class="hw" style="margin-top:10px;">
+          <div id="activityLog" style="font-size:14px;color:#6b2a3f">No events yet.</div>
+          <div style="margin-top:10px;">
+            <span class="badge" id="achievementBadge" style="display:none">⭐ Homework Hero</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Stats & Admin form -->
+    <aside class="stats" id="rightPanel">
+      <div class="stat-card">
+        <h4>Summary</h4>
+        <p class="small">Quick counts for teachers</p>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+          <div style="flex:1">
+            <div style="font-size:18px;font-weight:700;color:#7a1030" id="countHomeworks">0</div>
+            <div class="small">Homeworks</div>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:18px;font-weight:700;color:#7a1030" id="countAttendance">0</div>
+            <div class="small">Attendances</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN ONLY: Post / Edit Homework -->
+      <div class="panel" id="adminPanel" style="display:none">
+        <h3 style="margin:0;color:#7a1030">Post a Homework</h3>
+        <div class="sub-muted">Teachers can add assignments here</div>
+
+        <div class="form-row">
+          <input type="text" id="hw-title" placeholder="Title (e.g., Practice Loops)" />
+          <textarea id="hw-desc" placeholder="Description (what to prepare)"></textarea>
+          <input type="date" id="hw-date" />
+          <div style="display:flex;gap:8px;">
+            <button class="btn" id="postHwBtn">Post Homework</button>
+            <button class="btn ghost" id="clearHwBtn">Clear</button>
+          </div>
+          <div id="hw-msg" class="small" style="color:#4b1a2b"></div>
+        </div>
+
+        <hr style="border:none;border-top:1px dashed rgba(122,16,48,0.06);margin:12px 0">
+
+        <div>
+          <div class="small" style="color:var(--muted)">Manage posted homeworks</div>
+          <div id="homework-list-admin" style="margin-top:10px;max-height:200px;overflow:auto"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:8px;">
+        <button class="btn ghost" id="exportCsvBtn">Export Attendance CSV</button>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<!-- Confetti canvas -->
+<canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<script>
+/* =========================
+   Firebase config (unchanged)
+   ========================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyAdGjGxhgSW7QzDg-5JsqF9RbkgEFNdy04",
+  authDomain: "coding-class-17c8b.firebaseapp.com",
+  databaseURL: "https://coding-class-17c8b-default-rtdb.firebaseio.com",
+  projectId: "coding-class-17c8b",
+  storageBucket: "coding-class-17c8b.appspot.com",
+  messagingSenderId: "37958732398",
+  appId: "1:37958732398:web:12be3400a16204892cf47f"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+/* ===== App state ===== */
+let currentUser = "";
+let currentRole = "";
+let lastSeenHomeworkCount = 0;
+
+/* ===== Helpers ===== */
+function encodeEmail(e){ return String(e).replaceAll('.',' , '); } // slight substitution to avoid dot issue in read path display (we still write correct paths)
+function escapeHtml(s){ if(s==null) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll(\"'\",\"&#039;\"); }
+
+/* ===== UI elements ===== */
+const roleBadge = document.getElementById('roleBadge');
+const displayName = document.getElementById('displayName');
+const emailView = document.getElementById('emailView');
+const avatar = document.getElementById('avatar');
+
+const leftPanel = document.getElementById('leftPanel');
+const rightPanel = document.getElementById('rightPanel');
+
+const adminPanel = document.getElementById('adminPanel');
+const postHwBtn = document.getElementById('postHwBtn');
+const clearHwBtn = document.getElementById('clearHwBtn');
+const hwMsg = document.getElementById('hw-msg');
+
+const hwTitleInput = document.getElementById('hw-title');
+const hwDescInput = document.getElementById('hw-desc');
+const hwDateInput = document.getElementById('hw-date');
+
+const hwListStudent = document.getElementById('homework-list-student');
+const hwListAdmin = document.getElementById('homework-list-admin');
+
+const countHomeworks = document.getElementById('countHomeworks');
+const countAttendance = document.getElementById('countAttendance');
+
+const hwDot = document.getElementById('hwDot');
+const homeworkNotifBtn = document.getElementById('homeworkNotifBtn');
+
+const activityLog = document.getElementById('activityLog');
+const achievementBadge = document.getElementById('achievementBadge');
+
+/* ===== Confetti simple implementation ===== */
+const confettiCanvas = document.getElementById('confettiCanvas');
+confettiCanvas.width = window.innerWidth;
+confettiCanvas.height = window.innerHeight;
+const ctx = confettiCanvas.getContext('2d');
+let confettiPieces = [];
+function launchConfetti() {
+  confettiPieces = [];
+  const count = 80;
+  for(let i=0;i<count;i++){
+    confettiPieces.push({
+      x: Math.random()*confettiCanvas.width,
+      y: Math.random()*-confettiCanvas.height,
+      r: 6+Math.random()*8,
+      c: ['#ff66b3','#ffd6ec','#fff0f6','#ffb7da'][Math.floor(Math.random()*4)],
+      vx: (Math.random()-0.5)*4,
+      vy: 2+Math.random()*6,
+      rot: Math.random()*360
+    });
+  }
+  requestAnimationFrame(stepConfetti);
+}
+function stepConfetti(){
+  ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  for(const p of confettiPieces){
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += 6;
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillStyle = p.c;
+    ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6);
+    ctx.restore();
+  }
+  confettiPieces = confettiPieces.filter(p=>p.y < confettiCanvas.height + 50);
+  if(confettiPieces.length) requestAnimationFrame(stepConfetti);
+}
+
+/* ===== Auth & UI flow ===== */
+function showLoginUI(){
+  // show a simple login modal — we'll reuse firebase UI elsewhere
+  // For simplicity: recreate minimal login inputs
+  document.body.innerHTML = loginHtml();
+  // This simplified approach avoids mixing UI — but we prefer to keep the single file app.
+  // However user already has existing login; we'll instead fallback to auth.onAuthStateChanged below.
+}
+
+/* ===== Login handling (we show auth state changes) ===== */
+auth.onAuthStateChanged(user=>{
+  if(user){
+    currentUser = user.email;
+    // load role
+    db.ref('roles/' + encodeEmail(currentUser)).once('value').then(snap=>{
+      currentRole = snap.exists() ? snap.val() : 'student';
+      applyUIForRole();
+      // load counts & lists
+      subscribeHomeworks();
+      subscribeAttendanceCount();
+    }).catch(()=>{
+      currentRole = 'student';
+      applyUIForRole();
+      subscribeHomeworks();
+      subscribeAttendanceCount();
+    });
+  } else {
+    // show sign-in overlay (we'll create a simple sign-in form above the UI)
+    // For simplicity, sign-out will be handled by a popup login window.
+    // Instead: prompt user to sign in using a basic prompt (keeping same look)
+    showSignInPrompt();
+  }
+});
+
+/* ===== Sign-in prompt (keeps app single-file) ===== */
+function showSignInPrompt(){
+  // create a modal-like sign in form on top
+  const modal = document.createElement('div');
+  modal.style.position = 'fixed';
+  modal.style.left='0';modal.style.top='0';modal.style.width='100%';modal.style.height='100%';
+  modal.style.background='rgba(3,3,6,0.48)';modal.style.display='flex';modal.style.alignItems='center';modal.style.justifyContent='center';
+  modal.style.zIndex='9999';
+
+  modal.innerHTML = `
+    <div style="width:360px;background:linear-gradient(180deg,#fff,#fff7fb);padding:20px;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,0.18);">
+      <h3 style="margin:0 0 6px;color:#7a1030;">Sign in — Teacher or Student</h3>
+      <div style="color:var(--muted);font-size:13px;margin-bottom:12px">Use your email & password</div>
+      <input id="si-email" type="email" placeholder="Email" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(122,16,48,0.06);margin-bottom:8px" />
+      <input id="si-pass" type="password" placeholder="Password" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(122,16,48,0.06);margin-bottom:12px" />
+      <div style="display:flex;gap:8px">
+        <button id="si-btn" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-dark));border:0;color:white">Sign in</button>
+        <button id="si-guest" style="flex:1;padding:10px;border-radius:10px;border:1px dashed rgba(122,16,48,0.06);background:transparent">Guest</button>
+      </div>
+      <div style="text-align:center;margin-top:10px;font-size:12px;color:#a14a6f">Tip: Admin accounts must have role set in Firebase under /roles</div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  modal.querySelector('#si-btn').onclick = ()=>{
+    const email = modal.querySelector('#si-email').value.trim();
+    const pass = modal.querySelector('#si-pass').value.trim();
+    if(!email || !pass){ alert('Email & password required'); return; }
+    auth.signInWithEmailAndPassword(email,pass)
+      .then(()=>{ modal.remove(); })
+      .catch(e=>{ alert(e.message) });
+  };
+
+  modal.querySelector('#si-guest').onclick = ()=>{
+    // sign in anonymously (we'll use a fixed guest user)
+    // create a temporary guest object in UI (no firebase auth)
+    currentUser = 'guest@codingclass.local';
+    currentRole = 'student';
+    // remove modal and apply UI
+    modal.remove();
+    applyUIForRole();
+    subscribeHomeworks();
+    subscribeAttendanceCount();
+  };
+}
+
+/* ===== Apply UI per role ===== */
+function applyUIForRole(){
+  // role badge
+  roleBadge.textContent = currentRole === 'teacher' || currentRole === 'admin' ? 'Teacher' : 'Student';
+  // display name: friendly greeting — we keep Princess greeting
+  const shortName = (currentUser && currentUser !== 'guest@codingclass.local') ? currentUser.split('@')[0] : 'Princess';
+  displayName.textContent = (shortName.length>0? 'Princess ' + shortName : 'Princess');
+  emailView.textContent = currentUser || 'guest@example.com';
+
+  // show/hide admin panel
+  if(currentRole === 'teacher' || currentRole === 'admin'){
+    adminPanel.style.display = 'block';
+    document.getElementById('panelTitle').textContent = 'Teacher Dashboard';
+    document.getElementById('panelSubtitle').textContent = 'Manage homeworks & class';
+  } else {
+    adminPanel.style.display = 'none';
+    document.getElementById('panelTitle').textContent = 'Welcome to your class';
+    document.getElementById('panelSubtitle').textContent = 'Prepare, have fun & shine ✨';
+  }
+
+  // attach zoom button event
+  document.getElementById('zoomBtn').onclick = joinZoom;
+  document.getElementById('exportCsvBtn').onclick = exportCSV;
+
+  // attach admin buttons
+  postHwBtn.onclick = ()=> {
+    if(currentRole === 'teacher' || currentRole === 'admin') addHomework();
+    else alert('Only teacher can post homeworks');
+  };
+  clearHwBtn.onclick = ()=> { hwTitleInput.value=''; hwDescInput.value=''; hwDateInput.value=''; hwMsg.textContent=''; };
+
+  // homework notif button: when clicked, scroll to student list
+  homeworkNotifBtn.onclick = ()=> { document.getElementById('homework-list-student').scrollIntoView({behavior:'smooth'}); hwDot.style.display='none'; lastSeenHomeworkCount = parseInt(countHomeworks.textContent || '0'); }
+
+  // initial counts set
+  countHomeworks.textContent = '0';
+  countAttendance.textContent = '0';
+}
+
+/* ===== Homework CRUD ===== */
+function addHomework(){
+  const title = hwTitleInput.value.trim();
+  const desc = hwDescInput.value.trim();
+  const due = hwDateInput.value;
+  if(!title || !desc || !due){ hwMsg.style.color = '#a1223f'; hwMsg.textContent = 'All fields are required'; return; }
+
+  const newRef = db.ref('homeworks').push();
+  const payload = { title, desc, due, createdAt: new Date().toISOString(), createdBy: currentUser || 'teacher' };
+  newRef.set(payload).then(()=>{
+    hwMsg.style.color = '#7a1030'; hwMsg.textContent = 'Homework posted ✨';
+    hwTitleInput.value=''; hwDescInput.value=''; hwDateInput.value='';
+    setTimeout(()=>{ hwMsg.textContent=''; },1800);
+  }).catch(e=>{ hwMsg.style.color = '#a1223f'; hwMsg.textContent = e.message || 'Failed'; });
+}
+
+// load and subscribe homeworks (both admin & student)
+function subscribeHomeworks(){
+  const ref = db.ref('homeworks').orderByChild('createdAt');
+  ref.on('value', snapshot=>{
+    // update counts & lists
+    const arr = [];
+    snapshot.forEach(child=>{
+      const key = child.key;
+      const v = child.val();
+      arr.push({ key, ...v });
+    });
+    // newest first
+    arr.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+
+    // fill student list
+    renderStudentHomeworks(arr);
+    // fill admin list
+    renderAdminHomeworks(arr);
+    // update counts
+    countHomeworks.textContent = arr.length;
+    // notification: if new count increased beyond lastSeen, show dot
+    if(arr.length > lastSeenHomeworkCount){
+      const diff = arr.length - lastSeenHomeworkCount;
+      hwDot.style.display = 'flex';
+      hwDot.textContent = diff;
+    }
+  });
+}
+
+function renderStudentHomeworks(arr){
+  if(!arr.length){
+    hwListStudent.innerHTML = `<div class="hw"><div class="title"><h3 style="color:#a1223f">No Homeworks</h3></div><div class="desc small" style="color:var(--muted)">Teacher will post tasks here</div></div>`;
+    return;
+  }
+  hwListStudent.innerHTML = '';
+  const now = new Date();
+  arr.forEach(hw=>{
+    const dueDate = new Date(hw.due + 'T23:59:59'); // consider end of day
+    const diffMs = dueDate - now;
+    const days = Math.ceil(diffMs / (1000*60*60*24));
+    const daysText = days > 0 ? `${days} day${days>1?'s':''} left` : 'Due today / overdue';
+    const div = document.createElement('div');
+    div.className = 'hw';
+    div.innerHTML = `
+      <div class="title">
+        <h3>${escapeHtml(hw.title)} ✨</h3>
+        <div class="days-left">${escapeHtml(daysText)}</div>
+      </div>
+      <div class="desc">${escapeHtml(hw.desc)}</div>
+      <div class="meta">
+        <div class="due">Due: ${escapeHtml(hw.due)}</div>
+        <div class="small">Posted by: ${escapeHtml(hw.createdBy||'Teacher')}</div>
+      </div>
+    `;
+    hwListStudent.appendChild(div);
+  });
+}
+
+/* admin list with edit/delete */
+function renderAdminHomeworks(arr){
+  hwListAdmin.innerHTML = '';
+  if(!(currentRole==='teacher'||currentRole==='admin')) return;
+  if(!arr.length){
+    hwListAdmin.innerHTML = `<div class="small" style="color:var(--muted)">No homeworks yet</div>`;
+    return;
+  }
+  arr.forEach(hw=>{
+    const w = document.createElement('div');
+    w.className = 'hw';
+    w.style.display='flex';
+    w.style.flexDirection='column';
+    w.style.gap='8px';
+    w.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:700;color:#7a1030">${escapeHtml(hw.title)}</div>
+        <div class="admin-controls">
+          <button class="tiny edit">Edit</button>
+          <button class="tiny del">Delete</button>
+        </div>
+      </div>
+      <div style="color:#6b2a3f;font-size:13px">${escapeHtml(hw.desc)}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px">
+        <div>Due: ${escapeHtml(hw.due)}</div>
+        <div>Posted: ${new Date(hw.createdAt).toLocaleString()}</div>
+      </div>
+    `;
+    // events
+    w.querySelector('.del').onclick = ()=> {
+      if(confirm('Delete this homework?')) {
+        db.ref('homeworks/' + hw.key).remove();
+      }
+    };
+    w.querySelector('.edit').onclick = ()=> {
+      // populate form for editing
+      hwTitleInput.value = hw.title;
+      hwDescInput.value = hw.desc;
+      hwDateInput.value = hw.due;
+      hwMsg.style.color = '#7a1030';
+      hwMsg.textContent = 'Editing — make changes and click Post to update (will create new entry).';
+      // remove old item so post becomes an update replacement (simple approach)
+      db.ref('homeworks/' + hw.key).remove().then(()=>{ /* removed */ });
+    };
+    hwListAdmin.appendChild(w);
+  });
+}
+
+/* ===== Attendance subscription & counts ===== */
+function subscribeAttendanceCount(){
+  db.ref('attendance').on('value',snap=>{
+    let c = 0;
+    const items = [];
+    snap.forEach(ch=>{
+      items.push(ch.val());
+    });
+    c = items.length;
+    countAttendance.textContent = c;
+    // achievement example: if student has >=3 attendances, show badge and small note
+    if(currentRole==='student' && c >= 3){
+      achievementBadge.style.display = 'inline-block';
+      activityLog.innerHTML = `You have joined ${c} classes — keep going! 🎉`;
+    } else {
+      activityLog.innerHTML = `You have joined ${c} classes.`;
+    }
+  });
+}
+
+/* ===== Zoom & attendance write ===== */
+function joinZoom(){
+  // attendance write
+  const name = currentUser || 'Princess';
+  const now = new Date().toLocaleString();
+  db.ref('attendance').push({ name, time: now }).catch(()=>{});
+  // small activity in student panel
+  activityLog.innerHTML = `<strong style="color:#7a1030">${escapeHtml(name)}</strong> joined Zoom at ${escapeHtml(now)}`;
+  // confetti
+  launchConfetti();
+  // open zoom link
+  window.open('https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1','_blank');
+}
+
+/* ===== Export CSV ===== */
+function exportCSV(){
+  db.ref('attendance').once('value').then(snapshot=>{
+    if(!snapshot.exists()){ alert('No attendance data'); return; }
+    const rows = [['Name','Time']];
+    snapshot.forEach(ch=>{
+      const v = ch.val();
+      rows.push([v.name, v.time]);
+    });
+    const csv = rows.map(r=> r.map(cell => `"${String(cell).replace(/\"/g,'\"\"')}"`).join(',')).join('\\n');
+    const blob = new Blob([csv],{type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download='attendance.csv'; a.click(); URL.revokeObjectURL(url);
+  });
+}
+
+/* ===== Utility: delete old listeners on unload ===== */
+window.addEventListener('beforeunload', ()=> {
+  try{ db.ref('homeworks').off(); db.ref('attendance').off(); }catch(e){}
+});
+
+/* ===== Initialize once signed in: we'll subscribe in onAuthStateChanged earlier ===== */
+/* Already handled via subscribeHomeworks() and subscribeAttendanceCount() */
+
+/* ===== On-load small actions: check new homework notifications relative to current count ===== */
+db.ref('homeworks').once('value').then(snap=>{
+  let cnt = 0;
+  snap.forEach(()=>cnt++);
+  lastSeenHomeworkCount = cnt; // initial baseline so no initial badge
+  countHomeworks.textContent = cnt;
+}).catch(()=>{});
+
+/* ===== Simple sign-out via role badge click (for convenience) ===== */
+roleBadge.onclick = ()=> {
+  if(confirm('Sign out?')) auth.signOut().then(()=>{ location.reload(); });
+};
+
+/* ===== Add student UI for admin (if you want to keep old add student, uncomment below and adapt) ===== */
+
+/* ===== Note: admin editing creates a new entry (simple approach). If you want true inline edit, we can change it to update existing key instead. ===== */
+
+</script>
+</body>
+</html>
