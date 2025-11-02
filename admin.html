@@ -182,6 +182,35 @@
 
     // init function executed after auth guard passed
     function init(){ /* nothing else needed here; listeners are active */ }
+    function joinZoom() {
+  if (!auth.currentUser) {
+    alert("You must be logged in!");
+    return;
+  }
+
+  const user = auth.currentUser.email;
+  const now = new Date().toLocaleString();
+
+  // Save attendance in Firestore
+  db.collection("attendance").add({
+    name: user,
+    time: now
+  })
+  .then(() => {
+    console.log("Attendance saved for:", user);
+
+    // ✅ Open Zoom Meeting
+    window.open(
+      "https://us05web.zoom.us/j/84952905958?pwd=mp92Dd0kz6LWzxfxUzCY0UsNEUzGZ4.1",
+      "_blank"
+    );
+  })
+  .catch(error => {
+    console.error("Error saving attendance:", error);
+    alert("Attendance error: " + error.message);
+  });
+}
+
   </script>
 </body>
 </html>
