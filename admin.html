@@ -165,7 +165,20 @@
         });
       });
     });
-    joinZoom.addEventListener('click', async ()=>{
+
+    // export attendance CSV
+    exportBtn.addEventListener('click', async ()=>{
+      const snap = await getDocs(collection(db,'attendance'));
+      if(snap.empty){ alert('No attendance'); return; }
+      const rows = [['Name','Time']];
+      snap.forEach(s=>{ const d = s.data(); rows.push([d.name,d.time]); });
+      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='attendance.csv'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    logoutBtn.addEventListener('click', async ()=>{ await signOut(auth); window.location.href='index.html'; });
+
+        joinZoom.addEventListener('click', async ()=>{
       const user = auth.currentUser;
       const name = user ? user.email : 'guest';
       const now = new Date().toLocaleString();
@@ -182,23 +195,38 @@
       countAttend.textContent = c;
     });
 
-    // export attendance CSV
-    exportBtn.addEventListener('click', async ()=>{
-      const snap = await getDocs(collection(db,'attendance'));
-      if(snap.empty){ alert('No attendance'); return; }
-      const rows = [['Name','Time']];
-      snap.forEach(s=>{ const d = s.data(); rows.push([d.name,d.time]); });
-      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-      const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='attendance.csv'; a.click(); URL.revokeObjectURL(url);
-    });
-
-    logoutBtn.addEventListener('click', async ()=>{ await signOut(auth); window.location.href='index.html'; });
 
     // init function executed after auth guard passed
     function init(){ /* nothing else needed here; listeners are active */ }
 
 }
+    function joinZoom() {
+  if (!auth.currentUser) {
+    alert("You must be logged in!");
+    return;
+  }
 
+  const user = auth.currentUser.email;
+  const now = new Date().toLocaleString();
+
+  // Save attendance in Firestore
+  db.collection("attendance").add({
+    name: user,
+    time: now
+  })
+  .then(() => {
+    console.log("Attendance saved for:", user);
+
+    // ✅ Open Zoom Meeting
+    window.open(
+      "https://us05web.zoom.us/j/84952905958?pwd=mp92Dd0kz6LWzxfxUzCY0UsNEUzGZ4.1",
+      "_blank"
+    );
+  })
+  .catch(error => {
+    console.error("Error saving attendance:", error);
+    alert("Attendance error: " + error.message);
+  });
   </script>
 </body>
 </html>
