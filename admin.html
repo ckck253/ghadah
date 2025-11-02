@@ -105,6 +105,8 @@
     const logoutBtn = document.getElementById('logoutBtn');
      const joinZoom = document.getElementById('joinZoom');
 
+      const ZOOM_LINK = "https://us05web.zoom.us/j/84952905958?pwd=mp92Dd0kz6LWzxfxUzCY0UsNEUzGZ4.1";
+
     postBtn.addEventListener('click', async ()=>{
       const t = titleEl.value.trim(), d = descEl.value.trim(), due = dueEl.value;
       if(!t||!d||!due){ msg.style.color='#a1223f'; msg.textContent = 'All fields required'; return; }
