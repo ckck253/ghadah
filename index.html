@@ -1,701 +1,528 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Coding Class — Princess Edition</title>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#fff7fb;
-    --card:#fff;
-    --soft:#ffd6e8;
-    --accent:#ff66b3;
-    --accent-dark:#ff4d9a;
-    --muted:#8a94a6;
-    --glow: 0 8px 30px rgba(255,102,179,0.12);
-    --round:16px;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    min-height:100vh;
-    font-family: 'Quicksand', system-ui, -apple-system, 'Segoe UI', Roboto, 'Fira Code', monospace;
-    background: linear-gradient(180deg,#fff0f9 0%, #fff7fb 60%);
-    color:#342533;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:22px;
-  }
-
-  .card-shell{
-    width:100%;
-    max-width:920px;
-    border-radius:22px;
-    background: linear-gradient(180deg,#fff,#fff3fb);
-    box-shadow: var(--glow);
-    padding:18px;
-    border: 1px solid rgba(255,77,154,0.06);
-  }
-
-  header{
-    display:flex;
-    gap:14px;
-    align-items:center;
-    justify-content:space-between;
-    padding:10px 6px;
-  }
-
-  .brand{
-    display:flex;
-    gap:12px;
-    align-items:center;
-  }
-  .logo{
-    width:64px;height:64px;border-radius:14px;
-    background:linear-gradient(135deg, #fff0f6, #ffd6ec);
-    display:flex;align-items:center;justify-content:center;
-    box-shadow:0 6px 20px rgba(255,102,179,0.12);
-    font-size:28px;
-  }
-  .brand h1{margin:0;font-size:20px;color:var(--accent-dark);letter-spacing:0.6px}
-  .brand p{margin:0;font-size:12px;color:var(--muted)}
-
-  .controls{
-    display:flex;
-    gap:12px;
-    align-items:center;
-  }
-
-  .role-badge{
-    background:linear-gradient(90deg,#ffb7da,#ffd6ec);
-    padding:8px 12px;border-radius:999px;font-weight:700;color:#6b0d2d;
-    box-shadow:0 6px 18px rgba(255,77,154,0.08);
-    font-size:13px;
-  }
-
-  .greeting{
-    display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:13px;
-  }
-  .greeting .name{font-weight:700;color:#66223a;font-size:15px}
-  .avatar{
-    width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#fff2f8,#ffe6f5);
-    display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 6px 18px rgba(255,102,179,0.08);
-  }
-
-  main{display:grid;grid-template-columns:2fr 1fr;gap:18px;padding:10px 6px}
-
-  /* Left column (student / admin content) */
-  .panel{
-    background:var(--card);
-    border-radius:14px;
-    padding:14px;
-    box-shadow:0 8px 24px rgba(255,102,179,0.06);
-    border:1px solid rgba(255,77,154,0.04);
-  }
-
-  .panel h2{margin:0;font-size:16px;color:#6b122f}
-  .sub-muted{color:var(--muted);font-size:13px;margin-top:6px}
-
-  .top-actions{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
-  .btn{
-    border:0;padding:10px 12px;border-radius:12px;background:linear-gradient(180deg,var(--accent),var(--accent-dark));
-    color:white;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(255,77,154,0.12);
-  }
-  .btn.ghost{background:transparent;color:var(--accent-dark);border:1px dashed rgba(255,77,154,0.12);box-shadow:none;}
-
-  .small{
-    font-size:12px;color:var(--muted)
-  }
-
-  /* Homework list style */
-  .hw-list{margin-top:12px;display:flex;flex-direction:column;gap:10px;max-height:300px;overflow:auto;padding-right:6px}
-  .hw{
-    display:flex;flex-direction:column;padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff8fb,#fff0f6);
-    border:1px solid rgba(255,77,154,0.06);
-  }
-  .hw .title{display:flex;justify-content:space-between;align-items:center;gap:12px}
-  .hw .title h3{margin:0;font-size:15px;color:#7a1030}
-  .hw .desc{margin-top:8px;color:#6b2a3f;font-size:14px;white-space:pre-wrap}
-  .hw .meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
-  .due{font-size:13px;color:#a14a6f}
-  .days-left{font-weight:700;color:#ff3b8f;background:linear-gradient(90deg,#fff0f6,#ffd6ec);padding:6px 8px;border-radius:999px;font-size:12px}
-
-  /* Admin list controls */
-  .admin-controls{display:flex;gap:8px}
-  .tiny{padding:6px 8px;border-radius:8px;font-size:13px;border:0;cursor:pointer}
-  .edit{background:linear-gradient(90deg,#ffd6ec,#fff0f6);color:#7a1030;border:1px solid rgba(122,16,48,0.06)}
-  .del{background:linear-gradient(90deg,#ffe6ea,#ffdce8);color:#a1223f;border:1px solid rgba(161,34,63,0.05)}
-
-  /* Right column (stats, admin form) */
-  .stats{display:flex;flex-direction:column;gap:12px}
-  .stat-card{background:linear-gradient(180deg,#fff,#fff7f9);padding:12px;border-radius:12px;border:1px solid rgba(255,77,154,0.04)}
-  .stat-card h4{margin:0;color:#7a1030}
-  .stat-card p{margin:6px 0 0;color:var(--muted);font-size:13px}
-
-  /* Admin form */
-  .form-row{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-  input[type="text"], textarea, input[type="date"]{
-    padding:10px;border-radius:10px;border:1px solid rgba(122,16,48,0.06);font-family:inherit;
-  }
-  textarea{min-height:80px;resize:none}
-
-  /* badge */
-  .badge{
-    display:inline-block;padding:6px 8px;border-radius:999px;background:#ffecf6;color:#a1223f;font-weight:700;font-size:12px;
-    box-shadow:0 6px 16px rgba(255,102,179,0.06)
-  }
-
-  /* notification dot */
-  .notif {
-    position:relative;
-  }
-  .notif .dot {
-    position:absolute;right:-6px;top:-6px;background:#ff2d6f;width:16px;height:16px;border-radius:999px;color:white;font-size:11px;display:flex;align-items:center;justify-content:center;
-    box-shadow:0 6px 12px rgba(255,45,111,0.12)
-  }
-
-  /* confetti canvas full screen */
-  canvas.confetti-canvas{position:fixed;left:0;top:0;pointer-events:none;width:100%;height:100%;z-index:9999}
-
-  /* small responsive */
-  @media (max-width:880px){
-    main{grid-template-columns:1fr;gap:12px}
-    .brand h1{font-size:18px}
-  }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ghadah Classroom (Student & Teacher)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: linear-gradient(180deg,#fff0f9,#fff7fb);
+      --accent: #ff66b3;
+      --accent-dark:#ff4d9a;
+      --muted:#7b6b7a;
+      --card:#fff;
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:'Quicksand',system-ui,Segoe UI,Roboto; background:var(--bg);
+      display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;color:#342533;
+    }
+    .shell{width:100%;max-width:960px;border-radius:18px;background:linear-gradient(180deg,#fff,#fff3fb);padding:18px;box-shadow:0 10px 40px rgba(0,0,0,0.08)}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#fff0f6,#ffd6ec);display:flex;align-items:center;justify-content:center;font-size:28px}
+    .brand h1{margin:0;font-size:20px;color:var(--accent-dark)}
+    .small{font-size:13px;color:var(--muted)}
+    main{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:14px}
+    .panel{background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,77,154,0.04)}
+    .btn{padding:10px 12px;border-radius:12px;border:0;background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:white;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px dashed rgba(255,77,154,0.12);color:var(--accent-dark)}
+    .hw-list{display:flex;flex-direction:column;gap:10px;max-height:360px;overflow:auto;margin-top:10px;padding-right:6px}
+    .hw{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff8fb,#fff0f6);border:1px solid rgba(255,77,154,0.06)}
+    .hw h3{margin:0;color:#7a1030}
+    .meta{display:flex;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:13px}
+    .right-col .stat{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fff7f9);margin-bottom:8px}
+    .form-row{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    input[type="text"],textarea,input[type="date"]{padding:10px;border-radius:8px;border:1px solid rgba(122,16,48,0.06)}
+    textarea{min-height:80px;resize:none}
+    .hide{display:none}
+    .notif-dot{display:inline-flex;align-items:center;justify-content:center;background:#ff2d6f;color:white;width:18px;height:18px;border-radius:999px;font-size:12px;padding:2px;margin-left:6px}
+    canvas.confetti{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+    footer{margin-top:14px;text-align:center;color:var(--muted);font-size:13px}
+    @media (max-width:900px){main{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-<div class="card-shell">
-
-  <header>
-    <div class="brand">
-      <div class="logo">💖</div>
-      <div>
-        <h1>Coding Class — Princess Edition</h1>
-        <p class="small">Happy learning for little stars ✨</p>
-      </div>
-    </div>
-
-    <div class="controls">
-      <div class="role-badge" id="roleBadge">Student</div>
-      <div class="greeting">
-        <div class="name">Hello, <span id="displayName">Princess</span>! 👑</div>
-        <div class="small" id="emailView">guest@example.com</div>
-      </div>
-      <div class="avatar" id="avatar">🦄</div>
-    </div>
-  </header>
-
-  <main>
-    <!-- LEFT: Student view / Admin content -->
-    <section class="panel" id="leftPanel">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="logo">💖</div>
         <div>
-          <h2 id="panelTitle">Welcome</h2>
-          <div class="sub-muted" id="panelSubtitle">Your magical dashboard</div>
+          <h1>Ghadah Classroom</h1>
+          <div class="small">Student & Teacher Dashboard — Mon/Tue/Wed 5:30 PM (KSA)</div>
         </div>
+      </div>
 
-        <div style="display:flex;align-items:center;gap:10px">
-          <button class="btn" id="zoomBtn">Join Zoom ✨</button>
-          <div class="notif" style="margin-left:8px">
-            <button class="btn ghost" id="homeworkNotifBtn">Homeworks</button>
-            <div class="dot" id="hwDot" style="display:none">0</div>
+      <div id="userArea" style="display:flex;align-items:center;gap:12px">
+        <!-- shown after login -->
+      </div>
+    </header>
+
+    <main>
+      <!-- left: main content -->
+      <section class="panel" id="panelMain">
+        <!-- LOGIN UI (default) -->
+        <div id="loginBox">
+          <h2 style="margin-top:0;color:#7a1030">Sign in</h2>
+          <div class="small" style="margin-bottom:12px">Use Email / Password</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input id="email" type="email" placeholder="Email" style="flex:1" />
+            <input id="password" type="password" placeholder="Password" style="flex:1" />
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <button class="btn" id="btnSignIn">Sign in</button>
+            <button class="btn ghost" id="btnGuest">Guest</button>
+          </div>
+          <div id="err" style="color:#c43;margin-top:6px"></div>
+          <hr style="margin:12px 0;border:none;border-top:1px dashed rgba(122,16,48,0.06)" />
+          <div class="small">Or create account (for teacher/student testing)</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="regEmail" type="email" placeholder="New email" />
+            <input id="regPass" type="password" placeholder="Password" />
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn" id="btnRegister">Create account</button>
+            <button class="btn ghost" id="btnClearReg">Clear</button>
           </div>
         </div>
-      </div>
 
-      <div style="margin-top:12px">
-        <div class="sub-muted">Class schedule: <strong>Mon 8:30 PM (Lebanon)</strong></div>
-      </div>
+        <!-- Dashboard (after login) -->
+        <div id="dashboardUI" class="hide">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h2 id="welcomeTitle" style="margin:0;color:#7a1030">Welcome</h2>
+              <div class="small" id="welcomeSub">Your magical dashboard</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="small">Schedule</div>
+              <div class="small" style="font-weight:700">Mon · Tue · Wed — 5:30 PM (KSA)</div>
+            </div>
+          </div>
 
-      <!-- STUDENT HOMEWORK LIST (A: below zoom) -->
-      <h3 style="margin-top:14px;color:#a1223f">Homework <span style="font-size:13px;color:var(--muted)">(read-only)</span></h3>
-      <div class="hw-list" id="homework-list-student">
-        <!-- Filled by JS -->
-      </div>
+          <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn" id="btnZoom">Join Zoom</button>
+            <button class="btn ghost" id="btnLogout">Logout</button>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+              <div class="small">Homeworks</div>
+              <div id="notif" class="notif-dot hide">0</div>
+            </div>
+          </div>
 
-      <!-- Student local log & achievements -->
-      <div style="margin-top:12px;">
-        <h4 style="margin:0;color:#7a1030">Activity</h4>
-        <div class="sub-muted">Recent events</div>
-        <div class="hw" style="margin-top:10px;">
-          <div id="activityLog" style="font-size:14px;color:#6b2a3f">No events yet.</div>
-          <div style="margin-top:10px;">
-            <span class="badge" id="achievementBadge" style="display:none">⭐ Homework Hero</span>
+          <!-- Homework -->
+          <h3 style="margin-top:16px;color:#7a1030">Homework (read-only for students)</h3>
+          <div class="hw-list" id="hwList">
+            <!-- filled by JS -->
+          </div>
+
+          <!-- Activity/achievements -->
+          <div style="margin-top:12px">
+            <h4 style="margin:0;color:#7a1030">Activity</h4>
+            <div class="small" id="activity">No activity yet.</div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- RIGHT: Stats & Admin form -->
-    <aside class="stats" id="rightPanel">
-      <div class="stat-card">
-        <h4>Summary</h4>
-        <p class="small">Quick counts for teachers</p>
-        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-          <div style="flex:1">
-            <div style="font-size:18px;font-weight:700;color:#7a1030" id="countHomeworks">0</div>
-            <div class="small">Homeworks</div>
+      </section>
+
+      <!-- right: admin tools & stats -->
+      <aside class="right-col">
+        <div class="panel">
+          <h4 style="margin:0;color:#7a1030">Summary</h4>
+          <div class="small">Counts for teacher</div>
+          <div class="stat" style="margin-top:8px">
+            <div>Homeworks</div>
+            <div id="countHW">0</div>
           </div>
-          <div style="flex:1">
-            <div style="font-size:18px;font-weight:700;color:#7a1030" id="countAttendance">0</div>
-            <div class="small">Attendances</div>
+          <div class="stat">
+            <div>Attendances</div>
+            <div id="countAttend">0</div>
           </div>
         </div>
-      </div>
 
-      <!-- ADMIN ONLY: Post / Edit Homework -->
-      <div class="panel" id="adminPanel" style="display:none">
-        <h3 style="margin:0;color:#7a1030">Post a Homework</h3>
-        <div class="sub-muted">Teachers can add assignments here</div>
-
-        <div class="form-row">
-          <input type="text" id="hw-title" placeholder="Title (e.g., Practice Loops)" />
-          <textarea id="hw-desc" placeholder="Description (what to prepare)"></textarea>
-          <input type="date" id="hw-date" />
-          <div style="display:flex;gap:8px;">
-            <button class="btn" id="postHwBtn">Post Homework</button>
-            <button class="btn ghost" id="clearHwBtn">Clear</button>
+        <!-- Admin form -->
+        <div class="panel" id="adminPanel" style="margin-top:12px;display:none">
+          <h4 style="margin:0 0 8px 0;color:#7a1030">Post Homework</h4>
+          <div class="form-row">
+            <input id="hwTitle" type="text" placeholder="Title" />
+            <textarea id="hwDesc" placeholder="Description"></textarea>
+            <input id="hwDue" type="date" />
+            <div style="display:flex;gap:8px">
+              <button class="btn" id="btnPost">Post Homework</button>
+              <button class="btn ghost" id="btnClear">Clear</button>
+            </div>
+            <div id="hwMsg" class="small" style="color:#4b1a2b"></div>
           </div>
-          <div id="hw-msg" class="small" style="color:#4b1a2b"></div>
+
+          <hr style="margin:12px 0;border:none;border-top:1px dashed rgba(122,16,48,0.06)" />
+          <div class="small">Manage Posted</div>
+          <div class="hw-list" id="adminHwList" style="max-height:220px"></div>
+
+          <div style="margin-top:10px">
+            <button class="btn ghost" id="btnExport">Export Attendance CSV</button>
+          </div>
         </div>
 
-        <hr style="border:none;border-top:1px dashed rgba(122,16,48,0.06);margin:12px 0">
+      </aside>
+    </main>
 
-        <div>
-          <div class="small" style="color:var(--muted)">Manage posted homeworks</div>
-          <div id="homework-list-admin" style="margin-top:10px;max-height:200px;overflow:auto"></div>
-        </div>
-      </div>
+    <footer>
+      <div class="small">Ghadah Classroom · Zoom meetings Mon/Tue/Wed 5:30 PM KSA</div>
+    </footer>
+  </div>
 
-      <div style="margin-top:8px;">
-        <button class="btn ghost" id="exportCsvBtn">Export Attendance CSV</button>
-      </div>
-    </aside>
-  </main>
-</div>
+  <!-- confetti -->
+  <canvas id="confetti" class="confetti"></canvas>
 
-<!-- Confetti canvas -->
-<canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+  <!-- Firebase SDK (modular) -->
+  <script type="module">
+    // ---------- FIREBASE CONFIG ----------
+    // Replace this config block with your web app config shown when you added "ghadah-web"
+    const firebaseConfig = {
+      apiKey: "AIzaSyD2kF5QreVx8G7frZiz5RZMEukjwIhmLGc",
+      authDomain: "ghadah-class.firebaseapp.com",
+      projectId: "ghadah-class",
+      storageBucket: "ghadah-class.appspot.com",
+      messagingSenderId: "508662795233",
+      appId: "1:508662795233:web:67009c0ee392301a7520a0",
+      measurementId: "G-D9F3WKQZWJ"
+    };
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, addDoc, getDocs, onSnapshot, query, orderBy, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-<script>
-/* =========================
-   Firebase config (unchanged)
-   ========================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyAdGjGxhgSW7QzDg-5JsqF9RbkgEFNdy04",
-  authDomain: "coding-class-17c8b.firebaseapp.com",
-  databaseURL: "https://coding-class-17c8b-default-rtdb.firebaseio.com",
-  projectId: "coding-class-17c8b",
-  storageBucket: "coding-class-17c8b.appspot.com",
-  messagingSenderId: "37958732398",
-  appId: "1:37958732398:web:12be3400a16204892cf47f"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-/* ===== App state ===== */
-let currentUser = "";
-let currentRole = "";
-let lastSeenHomeworkCount = 0;
+    // ---------- DOM ----------
+    const loginBox = document.getElementById('loginBox');
+    const dashboardUI = document.getElementById('dashboardUI');
+    const userArea = document.getElementById('userArea');
+    const welcomeTitle = document.getElementById('welcomeTitle');
+    const welcomeSub = document.getElementById('welcomeSub');
 
-/* ===== Helpers ===== */
-function encodeEmail(e){ return String(e).replaceAll('.',' , '); } // slight substitution to avoid dot issue in read path display (we still write correct paths)
-function escapeHtml(s){ if(s==null) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll(\"'\",\"&#039;\"); }
+    const btnSignIn = document.getElementById('btnSignIn');
+    const btnRegister = document.getElementById('btnRegister');
+    const btnGuest = document.getElementById('btnGuest');
+    const btnLogout = document.getElementById('btnLogout');
 
-/* ===== UI elements ===== */
-const roleBadge = document.getElementById('roleBadge');
-const displayName = document.getElementById('displayName');
-const emailView = document.getElementById('emailView');
-const avatar = document.getElementById('avatar');
+    const hwList = document.getElementById('hwList');
+    const adminPanel = document.getElementById('adminPanel');
+    const adminHwList = document.getElementById('adminHwList');
+    const btnPost = document.getElementById('btnPost');
+    const btnClear = document.getElementById('btnClear');
+    const btnZoom = document.getElementById('btnZoom');
+    const notif = document.getElementById('notif');
 
-const leftPanel = document.getElementById('leftPanel');
-const rightPanel = document.getElementById('rightPanel');
+    const countHW = document.getElementById('countHW');
+    const countAttend = document.getElementById('countAttend');
 
-const adminPanel = document.getElementById('adminPanel');
-const postHwBtn = document.getElementById('postHwBtn');
-const clearHwBtn = document.getElementById('clearHwBtn');
-const hwMsg = document.getElementById('hw-msg');
+    // input fields
+    const emailInput = document.getElementById('email');
+    const passInput = document.getElementById('password');
+    const regEmail = document.getElementById('regEmail');
+    const regPass = document.getElementById('regPass');
 
-const hwTitleInput = document.getElementById('hw-title');
-const hwDescInput = document.getElementById('hw-desc');
-const hwDateInput = document.getElementById('hw-date');
+    const hwTitle = document.getElementById('hwTitle');
+    const hwDesc = document.getElementById('hwDesc');
+    const hwDue = document.getElementById('hwDue');
+    const hwMsg = document.getElementById('hwMsg');
 
-const hwListStudent = document.getElementById('homework-list-student');
-const hwListAdmin = document.getElementById('homework-list-admin');
+    // confetti canvas
+    const confCanvas = document.getElementById('confetti');
+    confCanvas.width = window.innerWidth;
+    confCanvas.height = window.innerHeight;
+    const cctx = confCanvas.getContext('2d');
 
-const countHomeworks = document.getElementById('countHomeworks');
-const countAttendance = document.getElementById('countAttendance');
+    // Zoom link & schedule (as you provided)
+    const ZOOM_LINK = "https://us05web.zoom.us/j/84952905958?pwd=mp92Dd0kz6LWzxfxUzCY0UsNEUzGZ4.1";
+    const SCHEDULE_TEXT = "Mon · Tue · Wed — 5:30 PM (KSA)";
 
-const hwDot = document.getElementById('hwDot');
-const homeworkNotifBtn = document.getElementById('homeworkNotifBtn');
+    // app state
+    let currentUser = null;
+    let currentRole = 'student'; // default
+    let lastHwCount = 0;
 
-const activityLog = document.getElementById('activityLog');
-const achievementBadge = document.getElementById('achievementBadge');
+    // ---------- small utilities ----------
+    function el(tag, attrs={}, inner=''){ const d = document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>d.setAttribute(k,v)); d.innerHTML = inner; return d; }
+    function escapeHtml(s){ if(s==null) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;"); }
 
-/* ===== Confetti simple implementation ===== */
-const confettiCanvas = document.getElementById('confettiCanvas');
-confettiCanvas.width = window.innerWidth;
-confettiCanvas.height = window.innerHeight;
-const ctx = confettiCanvas.getContext('2d');
-let confettiPieces = [];
-function launchConfetti() {
-  confettiPieces = [];
-  const count = 80;
-  for(let i=0;i<count;i++){
-    confettiPieces.push({
-      x: Math.random()*confettiCanvas.width,
-      y: Math.random()*-confettiCanvas.height,
-      r: 6+Math.random()*8,
-      c: ['#ff66b3','#ffd6ec','#fff0f6','#ffb7da'][Math.floor(Math.random()*4)],
-      vx: (Math.random()-0.5)*4,
-      vy: 2+Math.random()*6,
-      rot: Math.random()*360
-    });
-  }
-  requestAnimationFrame(stepConfetti);
-}
-function stepConfetti(){
-  ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
-  for(const p of confettiPieces){
-    p.x += p.vx;
-    p.y += p.vy;
-    p.rot += 6;
-    ctx.save();
-    ctx.translate(p.x,p.y);
-    ctx.rotate(p.rot*Math.PI/180);
-    ctx.fillStyle = p.c;
-    ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6);
-    ctx.restore();
-  }
-  confettiPieces = confettiPieces.filter(p=>p.y < confettiCanvas.height + 50);
-  if(confettiPieces.length) requestAnimationFrame(stepConfetti);
-}
-
-/* ===== Auth & UI flow ===== */
-function showLoginUI(){
-  // show a simple login modal — we'll reuse firebase UI elsewhere
-  // For simplicity: recreate minimal login inputs
-  document.body.innerHTML = loginHtml();
-  // This simplified approach avoids mixing UI — but we prefer to keep the single file app.
-  // However user already has existing login; we'll instead fallback to auth.onAuthStateChanged below.
-}
-
-/* ===== Login handling (we show auth state changes) ===== */
-auth.onAuthStateChanged(user=>{
-  if(user){
-    currentUser = user.email;
-    // load role
-    db.ref('roles/' + encodeEmail(currentUser)).once('value').then(snap=>{
-      currentRole = snap.exists() ? snap.val() : 'student';
-      applyUIForRole();
-      // load counts & lists
-      subscribeHomeworks();
-      subscribeAttendanceCount();
-    }).catch(()=>{
-      currentRole = 'student';
-      applyUIForRole();
-      subscribeHomeworks();
-      subscribeAttendanceCount();
-    });
-  } else {
-    // show sign-in overlay (we'll create a simple sign-in form above the UI)
-    // For simplicity, sign-out will be handled by a popup login window.
-    // Instead: prompt user to sign in using a basic prompt (keeping same look)
-    showSignInPrompt();
-  }
-});
-
-/* ===== Sign-in prompt (keeps app single-file) ===== */
-function showSignInPrompt(){
-  // create a modal-like sign in form on top
-  const modal = document.createElement('div');
-  modal.style.position = 'fixed';
-  modal.style.left='0';modal.style.top='0';modal.style.width='100%';modal.style.height='100%';
-  modal.style.background='rgba(3,3,6,0.48)';modal.style.display='flex';modal.style.alignItems='center';modal.style.justifyContent='center';
-  modal.style.zIndex='9999';
-
-  modal.innerHTML = `
-    <div style="width:360px;background:linear-gradient(180deg,#fff,#fff7fb);padding:20px;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,0.18);">
-      <h3 style="margin:0 0 6px;color:#7a1030;">Sign in — Teacher or Student</h3>
-      <div style="color:var(--muted);font-size:13px;margin-bottom:12px">Use your email & password</div>
-      <input id="si-email" type="email" placeholder="Email" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(122,16,48,0.06);margin-bottom:8px" />
-      <input id="si-pass" type="password" placeholder="Password" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(122,16,48,0.06);margin-bottom:12px" />
-      <div style="display:flex;gap:8px">
-        <button id="si-btn" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-dark));border:0;color:white">Sign in</button>
-        <button id="si-guest" style="flex:1;padding:10px;border-radius:10px;border:1px dashed rgba(122,16,48,0.06);background:transparent">Guest</button>
-      </div>
-      <div style="text-align:center;margin-top:10px;font-size:12px;color:#a14a6f">Tip: Admin accounts must have role set in Firebase under /roles</div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-
-  modal.querySelector('#si-btn').onclick = ()=>{
-    const email = modal.querySelector('#si-email').value.trim();
-    const pass = modal.querySelector('#si-pass').value.trim();
-    if(!email || !pass){ alert('Email & password required'); return; }
-    auth.signInWithEmailAndPassword(email,pass)
-      .then(()=>{ modal.remove(); })
-      .catch(e=>{ alert(e.message) });
-  };
-
-  modal.querySelector('#si-guest').onclick = ()=>{
-    // sign in anonymously (we'll use a fixed guest user)
-    // create a temporary guest object in UI (no firebase auth)
-    currentUser = 'guest@codingclass.local';
-    currentRole = 'student';
-    // remove modal and apply UI
-    modal.remove();
-    applyUIForRole();
-    subscribeHomeworks();
-    subscribeAttendanceCount();
-  };
-}
-
-/* ===== Apply UI per role ===== */
-function applyUIForRole(){
-  // role badge
-  roleBadge.textContent = currentRole === 'teacher' || currentRole === 'admin' ? 'Teacher' : 'Student';
-  // display name: friendly greeting — we keep Princess greeting
-  const shortName = (currentUser && currentUser !== 'guest@codingclass.local') ? currentUser.split('@')[0] : 'Princess';
-  displayName.textContent = (shortName.length>0? 'Princess ' + shortName : 'Princess');
-  emailView.textContent = currentUser || 'guest@example.com';
-
-  // show/hide admin panel
-  if(currentRole === 'teacher' || currentRole === 'admin'){
-    adminPanel.style.display = 'block';
-    document.getElementById('panelTitle').textContent = 'Teacher Dashboard';
-    document.getElementById('panelSubtitle').textContent = 'Manage homeworks & class';
-  } else {
-    adminPanel.style.display = 'none';
-    document.getElementById('panelTitle').textContent = 'Welcome to your class';
-    document.getElementById('panelSubtitle').textContent = 'Prepare, have fun & shine ✨';
-  }
-
-  // attach zoom button event
-  document.getElementById('zoomBtn').onclick = joinZoom;
-  document.getElementById('exportCsvBtn').onclick = exportCSV;
-
-  // attach admin buttons
-  postHwBtn.onclick = ()=> {
-    if(currentRole === 'teacher' || currentRole === 'admin') addHomework();
-    else alert('Only teacher can post homeworks');
-  };
-  clearHwBtn.onclick = ()=> { hwTitleInput.value=''; hwDescInput.value=''; hwDateInput.value=''; hwMsg.textContent=''; };
-
-  // homework notif button: when clicked, scroll to student list
-  homeworkNotifBtn.onclick = ()=> { document.getElementById('homework-list-student').scrollIntoView({behavior:'smooth'}); hwDot.style.display='none'; lastSeenHomeworkCount = parseInt(countHomeworks.textContent || '0'); }
-
-  // initial counts set
-  countHomeworks.textContent = '0';
-  countAttendance.textContent = '0';
-}
-
-/* ===== Homework CRUD ===== */
-function addHomework(){
-  const title = hwTitleInput.value.trim();
-  const desc = hwDescInput.value.trim();
-  const due = hwDateInput.value;
-  if(!title || !desc || !due){ hwMsg.style.color = '#a1223f'; hwMsg.textContent = 'All fields are required'; return; }
-
-  const newRef = db.ref('homeworks').push();
-  const payload = { title, desc, due, createdAt: new Date().toISOString(), createdBy: currentUser || 'teacher' };
-  newRef.set(payload).then(()=>{
-    hwMsg.style.color = '#7a1030'; hwMsg.textContent = 'Homework posted ✨';
-    hwTitleInput.value=''; hwDescInput.value=''; hwDateInput.value='';
-    setTimeout(()=>{ hwMsg.textContent=''; },1800);
-  }).catch(e=>{ hwMsg.style.color = '#a1223f'; hwMsg.textContent = e.message || 'Failed'; });
-}
-
-// load and subscribe homeworks (both admin & student)
-function subscribeHomeworks(){
-  const ref = db.ref('homeworks').orderByChild('createdAt');
-  ref.on('value', snapshot=>{
-    // update counts & lists
-    const arr = [];
-    snapshot.forEach(child=>{
-      const key = child.key;
-      const v = child.val();
-      arr.push({ key, ...v });
-    });
-    // newest first
-    arr.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
-
-    // fill student list
-    renderStudentHomeworks(arr);
-    // fill admin list
-    renderAdminHomeworks(arr);
-    // update counts
-    countHomeworks.textContent = arr.length;
-    // notification: if new count increased beyond lastSeen, show dot
-    if(arr.length > lastSeenHomeworkCount){
-      const diff = arr.length - lastSeenHomeworkCount;
-      hwDot.style.display = 'flex';
-      hwDot.textContent = diff;
-    }
-  });
-}
-
-function renderStudentHomeworks(arr){
-  if(!arr.length){
-    hwListStudent.innerHTML = `<div class="hw"><div class="title"><h3 style="color:#a1223f">No Homeworks</h3></div><div class="desc small" style="color:var(--muted)">Teacher will post tasks here</div></div>`;
-    return;
-  }
-  hwListStudent.innerHTML = '';
-  const now = new Date();
-  arr.forEach(hw=>{
-    const dueDate = new Date(hw.due + 'T23:59:59'); // consider end of day
-    const diffMs = dueDate - now;
-    const days = Math.ceil(diffMs / (1000*60*60*24));
-    const daysText = days > 0 ? `${days} day${days>1?'s':''} left` : 'Due today / overdue';
-    const div = document.createElement('div');
-    div.className = 'hw';
-    div.innerHTML = `
-      <div class="title">
-        <h3>${escapeHtml(hw.title)} ✨</h3>
-        <div class="days-left">${escapeHtml(daysText)}</div>
-      </div>
-      <div class="desc">${escapeHtml(hw.desc)}</div>
-      <div class="meta">
-        <div class="due">Due: ${escapeHtml(hw.due)}</div>
-        <div class="small">Posted by: ${escapeHtml(hw.createdBy||'Teacher')}</div>
-      </div>
-    `;
-    hwListStudent.appendChild(div);
-  });
-}
-
-/* admin list with edit/delete */
-function renderAdminHomeworks(arr){
-  hwListAdmin.innerHTML = '';
-  if(!(currentRole==='teacher'||currentRole==='admin')) return;
-  if(!arr.length){
-    hwListAdmin.innerHTML = `<div class="small" style="color:var(--muted)">No homeworks yet</div>`;
-    return;
-  }
-  arr.forEach(hw=>{
-    const w = document.createElement('div');
-    w.className = 'hw';
-    w.style.display='flex';
-    w.style.flexDirection='column';
-    w.style.gap='8px';
-    w.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="font-weight:700;color:#7a1030">${escapeHtml(hw.title)}</div>
-        <div class="admin-controls">
-          <button class="tiny edit">Edit</button>
-          <button class="tiny del">Delete</button>
-        </div>
-      </div>
-      <div style="color:#6b2a3f;font-size:13px">${escapeHtml(hw.desc)}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px">
-        <div>Due: ${escapeHtml(hw.due)}</div>
-        <div>Posted: ${new Date(hw.createdAt).toLocaleString()}</div>
-      </div>
-    `;
-    // events
-    w.querySelector('.del').onclick = ()=> {
-      if(confirm('Delete this homework?')) {
-        db.ref('homeworks/' + hw.key).remove();
+    // simple confetti (small)
+    function launchConfetti(){
+      const pieces = [];
+      for(let i=0;i<60;i++){
+        pieces.push({x: Math.random()*confCanvas.width, y:-Math.random()*200, r:4+Math.random()*8, c: ['#ff66b3','#ffd6ec','#fff0f6','#ffb7da'][Math.floor(Math.random()*4)], vx:(Math.random()-0.5)*2, vy:2+Math.random()*4, rot: Math.random()*360});
       }
-    };
-    w.querySelector('.edit').onclick = ()=> {
-      // populate form for editing
-      hwTitleInput.value = hw.title;
-      hwDescInput.value = hw.desc;
-      hwDateInput.value = hw.due;
-      hwMsg.style.color = '#7a1030';
-      hwMsg.textContent = 'Editing — make changes and click Post to update (will create new entry).';
-      // remove old item so post becomes an update replacement (simple approach)
-      db.ref('homeworks/' + hw.key).remove().then(()=>{ /* removed */ });
-    };
-    hwListAdmin.appendChild(w);
-  });
-}
-
-/* ===== Attendance subscription & counts ===== */
-function subscribeAttendanceCount(){
-  db.ref('attendance').on('value',snap=>{
-    let c = 0;
-    const items = [];
-    snap.forEach(ch=>{
-      items.push(ch.val());
-    });
-    c = items.length;
-    countAttendance.textContent = c;
-    // achievement example: if student has >=3 attendances, show badge and small note
-    if(currentRole==='student' && c >= 3){
-      achievementBadge.style.display = 'inline-block';
-      activityLog.innerHTML = `You have joined ${c} classes — keep going! 🎉`;
-    } else {
-      activityLog.innerHTML = `You have joined ${c} classes.`;
+      function step(){
+        cctx.clearRect(0,0,confCanvas.width,confCanvas.height);
+        for(const p of pieces){
+          p.x+=p.vx; p.y+=p.vy; p.rot+=6;
+          cctx.save(); cctx.translate(p.x,p.y); cctx.rotate(p.rot*Math.PI/180);
+          cctx.fillStyle = p.c; cctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6);
+          cctx.restore();
+        }
+        if(pieces.some(p=>p.y < confCanvas.height+50)) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
     }
-  });
-}
 
-/* ===== Zoom & attendance write ===== */
-function joinZoom(){
-  // attendance write
-  const name = currentUser || 'Princess';
-  const now = new Date().toLocaleString();
-  db.ref('attendance').push({ name, time: now }).catch(()=>{});
-  // small activity in student panel
-  activityLog.innerHTML = `<strong style="color:#7a1030">${escapeHtml(name)}</strong> joined Zoom at ${escapeHtml(now)}`;
-  // confetti
-  launchConfetti();
-  // open zoom link
-  window.open('https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1','_blank');
-}
+    // ---------- Auth handlers ----------
+    btnSignIn.onclick = async ()=>{
+      const email = emailInput.value.trim();
+      const pass = passInput.value.trim();
+      document.getElementById('err').textContent = '';
+      if(!email || !pass){ document.getElementById('err').textContent = 'Email & password required'; return; }
+      try{
+        await signInWithEmailAndPassword(auth, email, pass);
+        // onAuthStateChanged will handle UI
+      }catch(e){ document.getElementById('err').textContent = e.message; }
+    };
 
-/* ===== Export CSV ===== */
-function exportCSV(){
-  db.ref('attendance').once('value').then(snapshot=>{
-    if(!snapshot.exists()){ alert('No attendance data'); return; }
-    const rows = [['Name','Time']];
-    snapshot.forEach(ch=>{
-      const v = ch.val();
-      rows.push([v.name, v.time]);
+    btnRegister.onclick = async ()=>{
+      const email = regEmail.value.trim();
+      const pass = regPass.value.trim();
+      if(!email || !pass){ alert('Email & password required'); return; }
+      try{
+        const res = await createUserWithEmailAndPassword(auth, email, pass);
+        alert('Account created. Now set role in Firestore /roles if needed.');
+        // Optionally set default role document to student:
+        await setDoc(doc(db,'roles', email), { role: 'student' });
+        regEmail.value=''; regPass.value='';
+      }catch(e){ alert(e.message); }
+    };
+
+    btnGuest.onclick = ()=>{
+      // show guest (no auth) — limited student view
+      currentUser = { email: 'guest@local' };
+      currentRole = 'student';
+      showDashboard();
+    };
+
+    btnLogout.onclick = async ()=>{
+      try{ await signOut(auth); location.reload(); }catch(e){ location.reload(); }
+    };
+
+    // ---------- on auth state ----------
+    onAuthStateChanged(auth, async (user)=>{
+      if(user){
+        currentUser = user;
+        // read role from Firestore: collection 'roles' doc id = email
+        try{
+          const roleDoc = await getDocs(query(collection(db,'roles'))); /* fallback - we'll try direct read below */
+        }catch(e){}
+        // direct read doc
+        try{
+          const rdoc = (await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')).getDoc; // lazy import reference
+        }catch(e){}
+        // simpler: use getDoc
+        import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js').then(async (mod)=>{
+          const { doc, getDoc } = mod;
+          const docRef = doc(db,'roles', user.email);
+          const snap = await getDoc(docRef);
+          if(snap.exists()){
+            const data = snap.data();
+            currentRole = (data && data.role) ? data.role : 'student';
+          } else {
+            currentRole = 'student';
+          }
+          showDashboard();
+          subscribeHomeworks(); subscribeAttendanceCount();
+        }).catch(err=>{
+          currentRole = 'student';
+          showDashboard();
+          subscribeHomeworks(); subscribeAttendanceCount();
+        });
+      } else {
+        // show login
+        loginBox.classList.remove('hide');
+        dashboardUI.classList.add('hide');
+      }
     });
-    const csv = rows.map(r=> r.map(cell => `"${String(cell).replace(/\"/g,'\"\"')}"`).join(',')).join('\\n');
-    const blob = new Blob([csv],{type:'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download='attendance.csv'; a.click(); URL.revokeObjectURL(url);
-  });
-}
 
-/* ===== Utility: delete old listeners on unload ===== */
-window.addEventListener('beforeunload', ()=> {
-  try{ db.ref('homeworks').off(); db.ref('attendance').off(); }catch(e){}
-});
+    // ---------- Firestore helpers & listeners ----------
+    // subscribe homeworks
+    function subscribeHomeworks(){
+      const hwCol = collection(db,'homeworks');
+      const q = query(hwCol, orderBy('createdAt','desc'));
+      onSnapshot(q, snap=>{
+        const arr = [];
+        snap.forEach(docu=> arr.push({ id: docu.id, ...docu.data() }));
+        renderHomeworks(arr);
+        renderAdminList(arr);
+        countHW.textContent = arr.length;
+        if(arr.length > lastHwCount){
+          notif.classList.remove('hide'); notif.textContent = (arr.length - lastHwCount);
+        }
+      });
+    }
 
-/* ===== Initialize once signed in: we'll subscribe in onAuthStateChanged earlier ===== */
-/* Already handled via subscribeHomeworks() and subscribeAttendanceCount() */
+    // render student view
+    function renderHomeworks(arr){
+      hwList.innerHTML = '';
+      if(arr.length === 0){
+        hwList.innerHTML = '<div class="small">No homework yet</div>';
+        return;
+      }
+      const now = new Date();
+      arr.forEach(hw=>{
+        const d = new Date(hw.due + 'T23:59:59');
+        const diff = Math.ceil((d - now)/(1000*60*60*24));
+        const days = diff > 0 ? `${diff} day${diff>1?'s':''} left` : 'Due today / overdue';
+        const div = document.createElement('div'); div.className='hw';
+        div.innerHTML = `<h3>${escapeHtml(hw.title)} ✨</h3>
+                         <div class="desc">${escapeHtml(hw.desc)}</div>
+                         <div class="meta"><div>Due: ${escapeHtml(hw.due||'N/A')}</div><div>${escapeHtml(days)}</div></div>`;
+        hwList.appendChild(div);
+      });
+    }
 
-/* ===== On-load small actions: check new homework notifications relative to current count ===== */
-db.ref('homeworks').once('value').then(snap=>{
-  let cnt = 0;
-  snap.forEach(()=>cnt++);
-  lastSeenHomeworkCount = cnt; // initial baseline so no initial badge
-  countHomeworks.textContent = cnt;
-}).catch(()=>{});
+    // render admin list with edit/delete
+    function renderAdminList(arr){
+      adminHwList.innerHTML = '';
+      if(!(currentRole === 'teacher' || currentRole === 'admin')) return;
+      if(arr.length===0){ adminHwList.innerHTML = '<div class="small">No homeworks</div>'; return; }
+      arr.forEach(hw=>{
+        const w = document.createElement('div'); w.className='hw';
+        w.style.display='flex'; w.style.flexDirection='column';
+        w.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+                         <div style="font-weight:700;color:#7a1030">${escapeHtml(hw.title)}</div>
+                         <div>
+                           <button class="btn ghost tiny" data-id="${hw.id}" data-act="edit">Edit</button>
+                           <button class="btn ghost tiny" data-id="${hw.id}" data-act="del">Delete</button>
+                         </div>
+                       </div>
+                       <div style="color:#6b2a3f;font-size:13px">${escapeHtml(hw.desc)}</div>
+                       <div style="display:flex;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:12px">
+                        <div>Due: ${escapeHtml(hw.due||'N/A')}</div>
+                        <div>Posted: ${new Date(hw.createdAt?.toDate ? hw.createdAt.toDate() : hw.createdAt).toLocaleString()}</div>
+                       </div>`;
+        adminHwList.appendChild(w);
 
-/* ===== Simple sign-out via role badge click (for convenience) ===== */
-roleBadge.onclick = ()=> {
-  if(confirm('Sign out?')) auth.signOut().then(()=>{ location.reload(); });
-};
+        Array.from(w.querySelectorAll('button')).forEach(btn=>{
+          btn.addEventListener('click', async (e)=>{
+            const id = btn.getAttribute('data-id');
+            const act = btn.getAttribute('data-act');
+            if(act === 'del'){
+              if(confirm('Delete this homework?')){
+                await deleteDoc(doc(db,'homeworks', id));
+              }
+            } else if(act === 'edit'){
+              // load values into form, delete doc so post acts as update
+              const d = arr.find(x => x.id === id);
+              if(d){ hwTitle.value = d.title; hwDesc.value = d.desc; hwDue.value = d.due || ''; hwMsg.textContent='Editing (will replace)'; await deleteDoc(doc(db,'homeworks', id)); }
+            }
+          });
+        });
+      });
+    }
 
-/* ===== Add student UI for admin (if you want to keep old add student, uncomment below and adapt) ===== */
+    // attendance count subscription
+    function subscribeAttendanceCount(){
+      const col = collection(db,'attendance');
+      onSnapshot(col, snap=>{
+        let c = 0; const arr = [];
+        snap.forEach(s=>{ arr.push(s.data()); c++; });
+        countAttend.textContent = c;
+        if(currentRole === 'student') {
+          if(c >= 3) document.getElementById('activity').textContent = `You joined ${c} classes — great job! 🎉`;
+          else document.getElementById('activity').textContent = `You joined ${c} classes.`;
+        }
+      });
+    }
 
-/* ===== Note: admin editing creates a new entry (simple approach). If you want true inline edit, we can change it to update existing key instead. ===== */
+    // ---------- Actions: Post homework, export attendance ----------
+    btnPost.onclick = async ()=>{
+      if(!(currentRole === 'teacher' || currentRole === 'admin')){ alert('Only teacher can post'); return; }
+      const title = hwTitle.value.trim(); const desc = hwDesc.value.trim(); const due = hwDue.value;
+      if(!title || !desc || !due){ hwMsg.style.color='#a1223f'; hwMsg.textContent='All fields required'; return; }
+      const payload = { title, desc, due, createdAt: serverTimestamp(), createdBy: currentUser?.email || 'teacher' };
+      try{
+        await addDoc(collection(db,'homeworks'), payload);
+        hwMsg.style.color='#2b6a4f'; hwMsg.textContent='Posted ✨';
+        hwTitle.value=''; hwDesc.value=''; hwDue.value='';
+        setTimeout(()=>hwMsg.textContent='',1800);
+      }catch(e){ hwMsg.style.color='#a1223f'; hwMsg.textContent = e.message; }
+    };
 
-</script>
+    btnClear.onclick = ()=>{ hwTitle.value=''; hwDesc.value=''; hwDue.value=''; hwMsg.textContent=''; };
+
+    // export attendance CSV
+    document.getElementById('btnExport').onclick = async ()=>{
+      const snap = await getDocs(collection(db,'attendance'));
+      if(snap.empty){ alert('No attendance data'); return; }
+      const rows = [['Name','Time']];
+      snap.forEach(s=>{ const v = s.data(); rows.push([v.name, v.time]); });
+      const csv = rows.map(r=> r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download='attendance.csv'; a.click(); URL.revokeObjectURL(url);
+    };
+
+    // Zoom join action: write attendance then open zoom
+    btnZoom.onclick = async ()=>{
+      const name = currentUser?.email || 'guest';
+      const now = new Date().toLocaleString();
+      // write to firestore attendance collection
+      try{
+        await addDoc(collection(db,'attendance'), { name, time: now });
+      }catch(e){}
+      launchConfetti();
+      window.open(ZOOM_LINK,'_blank');
+    };
+
+    // ---------- Show dashboard UI after login/guest ----------
+    function showDashboard(){
+      loginBox.classList.add('hide');
+      dashboardUI.classList.remove('hide');
+      // user area (top-right)
+      userArea.innerHTML = `<div style="text-align:right"><div style="font-weight:700">Hello ${escapeHtml((currentUser?.email||'Guest').split('@')[0])} 👑</div><div class="small">${escapeHtml(currentUser?.email||'guest@local')}</div></div>`;
+      welcomeTitle.textContent = (currentRole === 'teacher' || currentRole === 'admin') ? 'Teacher Dashboard' : 'Welcome Princess';
+      welcomeSub.textContent = (currentRole === 'teacher' || currentRole === 'admin') ? 'Manage homeworks & attendances' : 'Prepare, have fun & shine ✨';
+      // show admin panel if teacher
+      adminPanel.style.display = (currentRole === 'teacher' || currentRole === 'admin') ? 'block' : 'none';
+      // set last seen count baseline
+      getDocs(collection(db,'homeworks')).then(snap=>{
+        lastHwCount = snap.size;
+      }).catch(()=>{ lastHwCount = 0; });
+    }
+
+    // ---------- Utility imports used above (getDoc/deleteDoc...) ----------
+    // Lazy helpers loaded earlier via dynamic import when needed (we used getDocs/addDoc/onSnapshot etc already)
+
+    // ---------- Manual instructions (you must do these in Firebase Console) ----------
+    // 1) In Firestore Console -> create collection "roles" and documents:
+    //    Document ID: teacher@codingclass.com  -> { role: "teacher" }
+    //    Document ID: ghadah@codingclass.com   -> { role: "student" }
+    //
+    // 2) In Firebase Console -> Authentication -> enable Email/Password sign-in (you already did)
+    //
+    // 3) In Firebase Console -> Authentication -> add users (teacher@codingclass.com, ghadah@codingclass.com) OR use "Create account" in the UI
+    //
+    // 4) In Firebase Console -> Firestore -> Rules: set rules to permit read to signed-in users and write for teacher only (I provided a rules snippet earlier)
+    //
+    // After you create the role documents and users, sign in with teacher to see admin panel.
+    // When done, tell me "done ✅" and I will:
+    //  - verify the role read flow
+    //  - help you adjust Firestore rules if needed
+    //  - optionally push this file into your GitHub repo for you
+
+    // ---------- small helper to use deleteDoc/doc/getDocs etc which we referenced earlier ----------
+    // dynamic references were used in event handlers; ensure these are available
+    import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js').then(mod=>{
+      window._fire_mod = mod; // for debug
+      // wire the functions used by handlers
+      window.doc = mod.doc;
+      window.deleteDoc = mod.deleteDoc;
+      window.getDocs = mod.getDocs;
+      window.addDoc = mod.addDoc;
+      window.query = mod.query;
+      window.collection = mod.collection;
+      window.serverTimestamp = mod.serverTimestamp;
+      window.onSnapshot = mod.onSnapshot;
+      window.orderBy = mod.orderBy;
+    }).catch(e=>console.warn('firestore import failed', e));
+
+  </script>
 </body>
 </html>
