@@ -75,158 +75,34 @@
     </div>
   </div>
 
-  <script type="module">
-    import { auth, db } from "./firebase.js";
-    import { signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-    import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-    // Auth guard: if not teacher, redirect to login
-    auth.onAuthStateChanged(async (u)=>{
-      if(!u){ window.location.href = 'index.html'; return; }
-      // check role doc
-      const r = await getDoc(doc(db,'roles', u.email));
-      const role = r.exists() && r.data().role ? r.data().role : 'student';
-      if(!(role === 'teacher' || role === 'admin')) { alert('Not authorized.'); await signOut(auth); window.location.href='index.html'; return; }
-      // otherwise continue to init
-      init();
-    });
+const joinZoomBtn = document.getElementById('joinZoom');
+const activity = document.getElementById('activity');
+const ZOOM_LINK = "https://us05web.zoom.us/j/84952905958?pwd=mp92Dd0kz6LWzxfxUzCY0UsNEUzGZ4.1";
 
-    // DOM
-    const titleEl = document.getElementById('title');
-    const descEl = document.getElementById('desc');
-    const dueEl = document.getElementById('due');
-    const postBtn = document.getElementById('postBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const msg = document.getElementById('msg');
-    const hwList = document.getElementById('hwList');
-    const countHW = document.getElementById('countHW');
-    const countAttend = document.getElementById('countAttend');
-    const exportBtn = document.getElementById('exportBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-     const joinZoom = document.getElementById('joinZoom');
-
-      const ZOOM_LINK = "https://us05web.zoom.us/j/84952905958?pwd=mp92Dd0kz6LWzxfxUzCY0UsNEUzGZ4.1";
-
-    postBtn.addEventListener('click', async ()=>{
-      const t = titleEl.value.trim(), d = descEl.value.trim(), due = dueEl.value;
-      if(!t||!d||!due){ msg.style.color='#a1223f'; msg.textContent = 'All fields required'; return; }
-      try{
-        await addDoc(collection(db,'homeworks'), { title:t, desc:d, due:due, createdAt: new Date() , createdBy: auth.currentUser.email });
-        msg.style.color='#2b6a4f'; msg.textContent='Posted';
-        titleEl.value=''; descEl.value=''; dueEl.value='';
-        setTimeout(()=>msg.textContent='',1600);
-      }catch(e){ msg.style.color='#a1223f'; msg.textContent=e.message; }
-    });
-
-    clearBtn.addEventListener('click', ()=>{ titleEl.value=''; descEl.value=''; dueEl.value=''; msg.textContent=''; });
-
-    // subscribe homeworks
-    const q = query(collection(db,'homeworks'), orderBy('createdAt','desc'));
-    onSnapshot(q, snap=>{
-      hwList.innerHTML='';
-      const arr = [];
-      snap.forEach(s=>{ const d = s.data(); arr.push({ id:s.id, ...d }); });
-      countHW.textContent = arr.length;
-      if(arr.length===0) hwList.innerHTML='<div class="small">No homeworks</div>';
-      arr.forEach(h=>{
-        const node = document.createElement('div'); node.className='hw';
-        const posted = (h.createdAt && h.createdAt.toDate) ? h.createdAt.toDate().toLocaleString() : (h.createdAt ? new Date(h.createdAt).toLocaleString() : '');
-        node.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:700">${h.title}</div>
-          <div>
-            <button class="btn ghost" data-id="${h.id}" data-act="edit">Edit</button>
-            <button class="btn ghost" data-id="${h.id}" data-act="del">Delete</button>
-          </div>
-        </div>
-        <div style="margin-top:6px;color:#6b2a3f">${h.desc}</div>
-        <div style="margin-top:8px;display:flex;justify-content:space-between;color:#7b6b7a;font-size:13px"><div>Due: ${h.due||'N/A'}</div><div>Posted: ${posted}</div></div>`;
-        hwList.appendChild(node);
-
-        node.querySelectorAll('button').forEach(b=>{
-          b.addEventListener('click', async ()=>{
-            const id = b.getAttribute('data-id'); const act = b.getAttribute('data-act');
-            if(act === 'del'){
-              if(confirm('Delete homework?')) await deleteDoc(doc(db,'homeworks',id));
-            }else if(act === 'edit'){
-              // simple edit: load into form and remove original
-              const docRef = doc(db,'homeworks',id);
-              const docSnap = await getDoc(docRef);
-              if(docSnap.exists()){
-                const data = docSnap.data();
-                titleEl.value = data.title || '';
-                descEl.value = data.desc || '';
-                dueEl.value = data.due || '';
-                // remove original - posting will replace
-                await deleteDoc(docRef);
-                msg.textContent = 'Editing - make changes and click Post';
-              }
-            }
-          });
-        });
-      });
-    });
-
-    // export attendance CSV
-    exportBtn.addEventListener('click', async ()=>{
-      const snap = await getDocs(collection(db,'attendance'));
-      if(snap.empty){ alert('No attendance'); return; }
-      const rows = [['Name','Time']];
-      snap.forEach(s=>{ const d = s.data(); rows.push([d.name,d.time]); });
-      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-      const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='attendance.csv'; a.click(); URL.revokeObjectURL(url);
-    });
-
-    logoutBtn.addEventListener('click', async ()=>{ await signOut(auth); window.location.href='index.html'; });
-
-        joinZoom.addEventListener('click', async ()=>{
-      const user = auth.currentUser;
-      const name = user ? user.email : 'guest';
-      const now = new Date().toLocaleString();
-      try{
-        await addDoc(collection(db,'attendance'), { name, time: now, classDay: new Date().toISOString().slice(0,10) });
-      }catch(e){}
-      activity.textContent = `${name} joined Zoom at ${now}`;
-      // confetti? simple visual
-      window.open(ZOOM_LINK,'_blank');
-    });
-    // attendance count subscription
-    onSnapshot(collection(db,'attendance'), snap=>{
-      let c = 0; snap.forEach(()=>c++);
-      countAttend.textContent = c;
-    });
-
-
-    // init function executed after auth guard passed
-    function init(){ /* nothing else needed here; listeners are active */ }
-
-}
-    function joinZoom() {
-  if (!auth.currentUser) {
-    alert("You must be logged in!");
-    return;
-  }
-
-  const user = auth.currentUser.email;
+joinZoomBtn.addEventListener('click', async () => {
+  const user = auth.currentUser;
+  if (!user) { alert("You must be logged in!"); return; }
+  const name = user.email;
   const now = new Date().toLocaleString();
 
-  // Save attendance in Firestore
-  db.collection("attendance").add({
-    name: user,
-    time: now
-  })
-  .then(() => {
-    console.log("Attendance saved for:", user);
-
-    // ✅ Open Zoom Meeting
-    window.open(
-      "https://us05web.zoom.us/j/84952905958?pwd=mp92Dd0kz6LWzxfxUzCY0UsNEUzGZ4.1",
-      "_blank"
-    );
-  })
-  .catch(error => {
+  try {
+    await addDoc(collection(db,'attendance'), {
+      name,
+      time: now,
+      classDay: new Date().toISOString().slice(0,10)
+    });
+    activity.textContent = `${name} joined Zoom at ${now}`;
+    window.open(ZOOM_LINK, '_blank');
+  } catch (error) {
     console.error("Error saving attendance:", error);
     alert("Attendance error: " + error.message);
-  });
-  </script>
+  }
+});
+</script>
 </body>
 </html>
