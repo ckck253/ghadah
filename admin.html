@@ -161,7 +161,17 @@
         });
       });
     });
-
+    joinZoom.addEventListener('click', async ()=>{
+      const user = auth.currentUser;
+      const name = user ? user.email : 'guest';
+      const now = new Date().toLocaleString();
+      try{
+        await addDoc(collection(db,'attendance'), { name, time: now, classDay: new Date().toISOString().slice(0,10) });
+      }catch(e){}
+      activity.textContent = `${name} joined Zoom at ${now}`;
+      // confetti? simple visual
+      window.open(ZOOM_LINK,'_blank');
+    });
     // attendance count subscription
     onSnapshot(collection(db,'attendance'), snap=>{
       let c = 0; snap.forEach(()=>c++);
