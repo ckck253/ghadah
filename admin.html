@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Teacher — Ghadah Classroom</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Quicksand',system-ui;margin:0;background:linear-gradient(180deg,#fff0f9,#fff7fb);padding:20px}
+    .wrap{max-width:1000px;margin:0 auto}
+    header{display:flex;justify-content:space-between;align-items:center}
+    .card{background:#fff;border-radius:12px;padding:14px;margin-top:12px;box-shadow:0 8px 30px rgba(0,0,0,0.06)}
+    .btn{padding:10px 12px;border-radius:10px;border:0;background:linear-gradient(180deg,#ff66b3,#ff4d9a);color:#fff;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px dashed rgba(255,77,154,0.12);color:#b02b6b}
+    .cols{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+    .hw-list{display:flex;flex-direction:column;gap:10px;max-height:360px;overflow:auto}
+    .hw{padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff8fb,#fff0f6);border:1px solid rgba(255,77,154,0.06)}
+    label{display:block;margin-top:8px;font-weight:600}
+    input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #f0c1dc}
+    textarea{min-height:80px;resize:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1 style="margin:0;color:#b02b6b">Teacher Dashboard</h1>
+        <div class="small">Post and manage homework — attendance export</div>
+      </div>
+      <div>
+        <button class="btn" id="logoutBtn">Sign out</button>
+      </div>
+    </header>
+
+    <div class="cols">
+      <div>
+        <div class="card">
+          <h3 style="margin:0 0 8px 0">Post Homework</h3>
+          <label>Title</label>
+          <input id="title" />
+          <label>Description</label>
+          <textarea id="desc"></textarea>
+          <label>Due Date</label>
+          <input id="due" type="date" />
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn" id="postBtn">Post</button>
+            <button class="btn ghost" id="clearBtn">Clear</button>
+          </div>
+          <div id="msg" style="margin-top:8px;color:#4b1a2b"></div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h3 style="margin:0 0 8px 0">Posted Homeworks</h3>
+          <div class="hw-list" id="hwList"></div>
+        </div>
+
+      </div>
+
+      <aside>
+        <div class="card">
+          <h4 style="margin:0">Summary</h4>
+          <div style="margin-top:8px;display:flex;justify-content:space-between">
+            <div>Homeworks</div><div id="countHW">0</div>
+          </div>
+          <div style="margin-top:8px;display:flex;justify-content:space-between">
+            <div>Attendances</div><div id="countAttend">0</div>
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn ghost" id="exportBtn">Export Attendance CSV</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    // Auth guard: if not teacher, redirect to login
+    auth.onAuthStateChanged(async (u)=>{
+      if(!u){ window.location.href = 'index.html'; return; }
+      // check role doc
+      const r = await getDoc(doc(db,'roles', u.email));
+      const role = r.exists() && r.data().role ? r.data().role : 'student';
+      if(!(role === 'teacher' || role === 'admin')) { alert('Not authorized.'); await signOut(auth); window.location.href='index.html'; return; }
+      // otherwise continue to init
+      init();
+    });
+
+    // DOM
+    const titleEl = document.getElementById('title');
+    const descEl = document.getElementById('desc');
+    const dueEl = document.getElementById('due');
+    const postBtn = document.getElementById('postBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const msg = document.getElementById('msg');
+    const hwList = document.getElementById('hwList');
+    const countHW = document.getElementById('countHW');
+    const countAttend = document.getElementById('countAttend');
+    const exportBtn = document.getElementById('exportBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    postBtn.addEventListener('click', async ()=>{
+      const t = titleEl.value.trim(), d = descEl.value.trim(), due = dueEl.value;
+      if(!t||!d||!due){ msg.style.color='#a1223f'; msg.textContent = 'All fields required'; return; }
+      try{
+        await addDoc(collection(db,'homeworks'), { title:t, desc:d, due:due, createdAt: new Date() , createdBy: auth.currentUser.email });
+        msg.style.color='#2b6a4f'; msg.textContent='Posted';
+        titleEl.value=''; descEl.value=''; dueEl.value='';
+        setTimeout(()=>msg.textContent='',1600);
+      }catch(e){ msg.style.color='#a1223f'; msg.textContent=e.message; }
+    });
+
+    clearBtn.addEventListener('click', ()=>{ titleEl.value=''; descEl.value=''; dueEl.value=''; msg.textContent=''; });
+
+    // subscribe homeworks
+    const q = query(collection(db,'homeworks'), orderBy('createdAt','desc'));
+    onSnapshot(q, snap=>{
+      hwList.innerHTML='';
+      const arr = [];
+      snap.forEach(s=>{ const d = s.data(); arr.push({ id:s.id, ...d }); });
+      countHW.textContent = arr.length;
+      if(arr.length===0) hwList.innerHTML='<div class="small">No homeworks</div>';
+      arr.forEach(h=>{
+        const node = document.createElement('div'); node.className='hw';
+        const posted = (h.createdAt && h.createdAt.toDate) ? h.createdAt.toDate().toLocaleString() : (h.createdAt ? new Date(h.createdAt).toLocaleString() : '');
+        node.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:700">${h.title}</div>
+          <div>
+            <button class="btn ghost" data-id="${h.id}" data-act="edit">Edit</button>
+            <button class="btn ghost" data-id="${h.id}" data-act="del">Delete</button>
+          </div>
+        </div>
+        <div style="margin-top:6px;color:#6b2a3f">${h.desc}</div>
+        <div style="margin-top:8px;display:flex;justify-content:space-between;color:#7b6b7a;font-size:13px"><div>Due: ${h.due||'N/A'}</div><div>Posted: ${posted}</div></div>`;
+        hwList.appendChild(node);
+
+        node.querySelectorAll('button').forEach(b=>{
+          b.addEventListener('click', async ()=>{
+            const id = b.getAttribute('data-id'); const act = b.getAttribute('data-act');
+            if(act === 'del'){
+              if(confirm('Delete homework?')) await deleteDoc(doc(db,'homeworks',id));
+            }else if(act === 'edit'){
+              // simple edit: load into form and remove original
+              const docRef = doc(db,'homeworks',id);
+              const docSnap = await getDoc(docRef);
+              if(docSnap.exists()){
+                const data = docSnap.data();
+                titleEl.value = data.title || '';
+                descEl.value = data.desc || '';
+                dueEl.value = data.due || '';
+                // remove original - posting will replace
+                await deleteDoc(docRef);
+                msg.textContent = 'Editing - make changes and click Post';
+              }
+            }
+          });
+        });
+      });
+    });
+
+    // attendance count subscription
+    onSnapshot(collection(db,'attendance'), snap=>{
+      let c = 0; snap.forEach(()=>c++);
+      countAttend.textContent = c;
+    });
+
+    // export attendance CSV
+    exportBtn.addEventListener('click', async ()=>{
+      const snap = await getDocs(collection(db,'attendance'));
+      if(snap.empty){ alert('No attendance'); return; }
+      const rows = [['Name','Time']];
+      snap.forEach(s=>{ const d = s.data(); rows.push([d.name,d.time]); });
+      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='attendance.csv'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    logoutBtn.addEventListener('click', async ()=>{ await signOut(auth); window.location.href='index.html'; });
+
+    // init function executed after auth guard passed
+    function init(){ /* nothing else needed here; listeners are active */ }
+  </script>
+</body>
+</html>

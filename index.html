@@ -3,526 +3,109 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ghadah Classroom (Student & Teacher)</title>
+  <title>Ghadah Classroom — Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg: linear-gradient(180deg,#fff0f9,#fff7fb);
-      --accent: #ff66b3;
-      --accent-dark:#ff4d9a;
-      --muted:#7b6b7a;
-      --card:#fff;
-      --radius:14px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;font-family:'Quicksand',system-ui,Segoe UI,Roboto; background:var(--bg);
-      display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;color:#342533;
-    }
-    .shell{width:100%;max-width:960px;border-radius:18px;background:linear-gradient(180deg,#fff,#fff3fb);padding:18px;box-shadow:0 10px 40px rgba(0,0,0,0.08)}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#fff0f6,#ffd6ec);display:flex;align-items:center;justify-content:center;font-size:28px}
-    .brand h1{margin:0;font-size:20px;color:var(--accent-dark)}
-    .small{font-size:13px;color:var(--muted)}
-    main{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:14px}
-    .panel{background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,77,154,0.04)}
-    .btn{padding:10px 12px;border-radius:12px;border:0;background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:white;font-weight:700;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px dashed rgba(255,77,154,0.12);color:var(--accent-dark)}
-    .hw-list{display:flex;flex-direction:column;gap:10px;max-height:360px;overflow:auto;margin-top:10px;padding-right:6px}
-    .hw{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff8fb,#fff0f6);border:1px solid rgba(255,77,154,0.06)}
-    .hw h3{margin:0;color:#7a1030}
-    .meta{display:flex;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:13px}
-    .right-col .stat{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fff7f9);margin-bottom:8px}
-    .form-row{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-    input[type="text"],textarea,input[type="date"]{padding:10px;border-radius:8px;border:1px solid rgba(122,16,48,0.06)}
-    textarea{min-height:80px;resize:none}
-    .hide{display:none}
-    .notif-dot{display:inline-flex;align-items:center;justify-content:center;background:#ff2d6f;color:white;width:18px;height:18px;border-radius:999px;font-size:12px;padding:2px;margin-left:6px}
-    canvas.confetti{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:9999}
-    footer{margin-top:14px;text-align:center;color:var(--muted);font-size:13px}
-    @media (max-width:900px){main{grid-template-columns:1fr}}
+    body{font-family:"Quicksand",system-ui;margin:0;background:linear-gradient(180deg,#fff0f9,#fff7fb);display:flex;align-items:center;justify-content:center;height:100vh;padding:20px}
+    .box{width:100%;max-width:460px;background:#fff;border-radius:14px;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,0.08)}
+    h1{margin:0 0 12px;color:#b02b6b}
+    label{font-weight:600;font-size:14px;margin-top:10px;display:block}
+    input{width:100%;padding:10px;border-radius:8px;border:1px solid #f0c1dc;margin-top:6px}
+    .row{display:flex;gap:8px;margin-top:12px}
+    .btn{flex:1;padding:10px;border-radius:10px;border:0;background:linear-gradient(180deg,#ff66b3,#ff4d9a);color:#fff;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px dashed rgba(255,77,154,0.12);color:#b02b6b}
+    .hint{font-size:13px;color:#7b6b7a;margin-top:10px}
+    .err{color:#c43;margin-top:8px}
   </style>
 </head>
 <body>
-  <div class="shell">
-    <header>
-      <div class="brand">
-        <div class="logo">💖</div>
-        <div>
-          <h1>Ghadah Classroom</h1>
-          <div class="small">Student & Teacher Dashboard — Mon/Tue/Wed 5:30 PM (KSA)</div>
-        </div>
+  <div class="box">
+    <h1>Sign in — Ghadah Classroom</h1>
+
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="teacher@codingclass.com or ghadah@codingclass.com" />
+
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="your password" />
+
+    <div class="row">
+      <button class="btn" id="signInBtn">Sign in</button>
+      <button class="btn ghost" id="guestBtn">Guest</button>
+    </div>
+
+    <div style="margin-top:14px;">
+      <div class="hint">Create test accounts (optional):</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="regEmail" type="email" placeholder="new email" />
+        <input id="regPass" type="password" placeholder="password" />
       </div>
-
-      <div id="userArea" style="display:flex;align-items:center;gap:12px">
-        <!-- shown after login -->
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" id="createBtn">Create account</button>
+        <button class="btn ghost" id="clearReg">Clear</button>
       </div>
-    </header>
+    </div>
 
-    <main>
-      <!-- left: main content -->
-      <section class="panel" id="panelMain">
-        <!-- LOGIN UI (default) -->
-        <div id="loginBox">
-          <h2 style="margin-top:0;color:#7a1030">Sign in</h2>
-          <div class="small" style="margin-bottom:12px">Use Email / Password</div>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <input id="email" type="email" placeholder="Email" style="flex:1" />
-            <input id="password" type="password" placeholder="Password" style="flex:1" />
-          </div>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <button class="btn" id="btnSignIn">Sign in</button>
-            <button class="btn ghost" id="btnGuest">Guest</button>
-          </div>
-          <div id="err" style="color:#c43;margin-top:6px"></div>
-          <hr style="margin:12px 0;border:none;border-top:1px dashed rgba(122,16,48,0.06)" />
-          <div class="small">Or create account (for teacher/student testing)</div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <input id="regEmail" type="email" placeholder="New email" />
-            <input id="regPass" type="password" placeholder="Password" />
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="btn" id="btnRegister">Create account</button>
-            <button class="btn ghost" id="btnClearReg">Clear</button>
-          </div>
-        </div>
-
-        <!-- Dashboard (after login) -->
-        <div id="dashboardUI" class="hide">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <h2 id="welcomeTitle" style="margin:0;color:#7a1030">Welcome</h2>
-              <div class="small" id="welcomeSub">Your magical dashboard</div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div class="small">Schedule</div>
-              <div class="small" style="font-weight:700">Mon · Tue · Wed — 5:30 PM (KSA)</div>
-            </div>
-          </div>
-
-          <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
-            <button class="btn" id="btnZoom">Join Zoom</button>
-            <button class="btn ghost" id="btnLogout">Logout</button>
-            <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-              <div class="small">Homeworks</div>
-              <div id="notif" class="notif-dot hide">0</div>
-            </div>
-          </div>
-
-          <!-- Homework -->
-          <h3 style="margin-top:16px;color:#7a1030">Homework (read-only for students)</h3>
-          <div class="hw-list" id="hwList">
-            <!-- filled by JS -->
-          </div>
-
-          <!-- Activity/achievements -->
-          <div style="margin-top:12px">
-            <h4 style="margin:0;color:#7a1030">Activity</h4>
-            <div class="small" id="activity">No activity yet.</div>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- right: admin tools & stats -->
-      <aside class="right-col">
-        <div class="panel">
-          <h4 style="margin:0;color:#7a1030">Summary</h4>
-          <div class="small">Counts for teacher</div>
-          <div class="stat" style="margin-top:8px">
-            <div>Homeworks</div>
-            <div id="countHW">0</div>
-          </div>
-          <div class="stat">
-            <div>Attendances</div>
-            <div id="countAttend">0</div>
-          </div>
-        </div>
-
-        <!-- Admin form -->
-        <div class="panel" id="adminPanel" style="margin-top:12px;display:none">
-          <h4 style="margin:0 0 8px 0;color:#7a1030">Post Homework</h4>
-          <div class="form-row">
-            <input id="hwTitle" type="text" placeholder="Title" />
-            <textarea id="hwDesc" placeholder="Description"></textarea>
-            <input id="hwDue" type="date" />
-            <div style="display:flex;gap:8px">
-              <button class="btn" id="btnPost">Post Homework</button>
-              <button class="btn ghost" id="btnClear">Clear</button>
-            </div>
-            <div id="hwMsg" class="small" style="color:#4b1a2b"></div>
-          </div>
-
-          <hr style="margin:12px 0;border:none;border-top:1px dashed rgba(122,16,48,0.06)" />
-          <div class="small">Manage Posted</div>
-          <div class="hw-list" id="adminHwList" style="max-height:220px"></div>
-
-          <div style="margin-top:10px">
-            <button class="btn ghost" id="btnExport">Export Attendance CSV</button>
-          </div>
-        </div>
-
-      </aside>
-    </main>
-
-    <footer>
-      <div class="small">Ghadah Classroom · Zoom meetings Mon/Tue/Wed 5:30 PM KSA</div>
-    </footer>
+    <div class="err" id="err"></div>
+    <div class="hint" style="margin-top:12px">After sign-in the app will redirect teachers to <strong>admin.html</strong> and students to <strong>student.html</strong>.</div>
   </div>
 
-  <!-- confetti -->
-  <canvas id="confetti" class="confetti"></canvas>
-
-  <!-- Firebase SDK (modular) -->
   <script type="module">
-    // ---------- FIREBASE CONFIG ----------
-    // Replace this config block with your web app config shown when you added "ghadah-web"
-    const firebaseConfig = {
-      apiKey: "AIzaSyD2kF5QreVx8G7frZiz5RZMEukjwIhmLGc",
-      authDomain: "ghadah-class.firebaseapp.com",
-      projectId: "ghadah-class",
-      storageBucket: "ghadah-class.appspot.com",
-      messagingSenderId: "508662795233",
-      appId: "1:508662795233:web:67009c0ee392301a7520a0",
-      measurementId: "G-D9F3WKQZWJ"
-    };
+    import { auth, db } from "./firebase.js";
+    import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, addDoc, getDocs, onSnapshot, query, orderBy, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // ---------- DOM ----------
-    const loginBox = document.getElementById('loginBox');
-    const dashboardUI = document.getElementById('dashboardUI');
-    const userArea = document.getElementById('userArea');
-    const welcomeTitle = document.getElementById('welcomeTitle');
-    const welcomeSub = document.getElementById('welcomeSub');
-
-    const btnSignIn = document.getElementById('btnSignIn');
-    const btnRegister = document.getElementById('btnRegister');
-    const btnGuest = document.getElementById('btnGuest');
-    const btnLogout = document.getElementById('btnLogout');
-
-    const hwList = document.getElementById('hwList');
-    const adminPanel = document.getElementById('adminPanel');
-    const adminHwList = document.getElementById('adminHwList');
-    const btnPost = document.getElementById('btnPost');
-    const btnClear = document.getElementById('btnClear');
-    const btnZoom = document.getElementById('btnZoom');
-    const notif = document.getElementById('notif');
-
-    const countHW = document.getElementById('countHW');
-    const countAttend = document.getElementById('countAttend');
-
-    // input fields
+    const errEl = document.getElementById('err');
     const emailInput = document.getElementById('email');
     const passInput = document.getElementById('password');
+    const signInBtn = document.getElementById('signInBtn');
+    const guestBtn = document.getElementById('guestBtn');
+
     const regEmail = document.getElementById('regEmail');
     const regPass = document.getElementById('regPass');
+    const createBtn = document.getElementById('createBtn');
+    const clearReg = document.getElementById('clearReg');
 
-    const hwTitle = document.getElementById('hwTitle');
-    const hwDesc = document.getElementById('hwDesc');
-    const hwDue = document.getElementById('hwDue');
-    const hwMsg = document.getElementById('hwMsg');
-
-    // confetti canvas
-    const confCanvas = document.getElementById('confetti');
-    confCanvas.width = window.innerWidth;
-    confCanvas.height = window.innerHeight;
-    const cctx = confCanvas.getContext('2d');
-
-    // Zoom link & schedule (as you provided)
-    const ZOOM_LINK = "https://us05web.zoom.us/j/84952905958?pwd=mp92Dd0kz6LWzxfxUzCY0UsNEUzGZ4.1";
-    const SCHEDULE_TEXT = "Mon · Tue · Wed — 5:30 PM (KSA)";
-
-    // app state
-    let currentUser = null;
-    let currentRole = 'student'; // default
-    let lastHwCount = 0;
-
-    // ---------- small utilities ----------
-    function el(tag, attrs={}, inner=''){ const d = document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>d.setAttribute(k,v)); d.innerHTML = inner; return d; }
-    function escapeHtml(s){ if(s==null) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;"); }
-
-    // simple confetti (small)
-    function launchConfetti(){
-      const pieces = [];
-      for(let i=0;i<60;i++){
-        pieces.push({x: Math.random()*confCanvas.width, y:-Math.random()*200, r:4+Math.random()*8, c: ['#ff66b3','#ffd6ec','#fff0f6','#ffb7da'][Math.floor(Math.random()*4)], vx:(Math.random()-0.5)*2, vy:2+Math.random()*4, rot: Math.random()*360});
-      }
-      function step(){
-        cctx.clearRect(0,0,confCanvas.width,confCanvas.height);
-        for(const p of pieces){
-          p.x+=p.vx; p.y+=p.vy; p.rot+=6;
-          cctx.save(); cctx.translate(p.x,p.y); cctx.rotate(p.rot*Math.PI/180);
-          cctx.fillStyle = p.c; cctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6);
-          cctx.restore();
-        }
-        if(pieces.some(p=>p.y < confCanvas.height+50)) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    }
-
-    // ---------- Auth handlers ----------
-    btnSignIn.onclick = async ()=>{
+    signInBtn.addEventListener('click', async ()=>{
+      errEl.textContent = '';
       const email = emailInput.value.trim();
-      const pass = passInput.value.trim();
-      document.getElementById('err').textContent = '';
-      if(!email || !pass){ document.getElementById('err').textContent = 'Email & password required'; return; }
+      const pass = passInput.value;
+      if(!email || !pass){ errEl.textContent = 'Email and password required'; return; }
       try{
         await signInWithEmailAndPassword(auth, email, pass);
-        // onAuthStateChanged will handle UI
-      }catch(e){ document.getElementById('err').textContent = e.message; }
-    };
 
-    btnRegister.onclick = async ()=>{
-      const email = regEmail.value.trim();
-      const pass = regPass.value.trim();
-      if(!email || !pass){ alert('Email & password required'); return; }
-      try{
-        const res = await createUserWithEmailAndPassword(auth, email, pass);
-        alert('Account created. Now set role in Firestore /roles if needed.');
-        // Optionally set default role document to student:
-        await setDoc(doc(db,'roles', email), { role: 'student' });
-        regEmail.value=''; regPass.value='';
-      }catch(e){ alert(e.message); }
-    };
+        // read role doc (document id is the email)
+        const roleDocRef = doc(db, "roles", email);
+        const snap = await getDoc(roleDocRef);
+        const role = snap.exists() && snap.data().role ? snap.data().role : 'student';
 
-    btnGuest.onclick = ()=>{
-      // show guest (no auth) — limited student view
-      currentUser = { email: 'guest@local' };
-      currentRole = 'student';
-      showDashboard();
-    };
-
-    btnLogout.onclick = async ()=>{
-      try{ await signOut(auth); location.reload(); }catch(e){ location.reload(); }
-    };
-
-    // ---------- on auth state ----------
-    onAuthStateChanged(auth, async (user)=>{
-      if(user){
-        currentUser = user;
-        // read role from Firestore: collection 'roles' doc id = email
-        try{
-          const roleDoc = await getDocs(query(collection(db,'roles'))); /* fallback - we'll try direct read below */
-        }catch(e){}
-        // direct read doc
-        try{
-          const rdoc = (await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')).getDoc; // lazy import reference
-        }catch(e){}
-        // simpler: use getDoc
-        import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js').then(async (mod)=>{
-          const { doc, getDoc } = mod;
-          const docRef = doc(db,'roles', user.email);
-          const snap = await getDoc(docRef);
-          if(snap.exists()){
-            const data = snap.data();
-            currentRole = (data && data.role) ? data.role : 'student';
-          } else {
-            currentRole = 'student';
-          }
-          showDashboard();
-          subscribeHomeworks(); subscribeAttendanceCount();
-        }).catch(err=>{
-          currentRole = 'student';
-          showDashboard();
-          subscribeHomeworks(); subscribeAttendanceCount();
-        });
-      } else {
-        // show login
-        loginBox.classList.remove('hide');
-        dashboardUI.classList.add('hide');
+        if(role === 'teacher' || role === 'admin'){
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'student.html';
+        }
+      }catch(e){
+        errEl.textContent = e.message;
       }
     });
 
-    // ---------- Firestore helpers & listeners ----------
-    // subscribe homeworks
-    function subscribeHomeworks(){
-      const hwCol = collection(db,'homeworks');
-      const q = query(hwCol, orderBy('createdAt','desc'));
-      onSnapshot(q, snap=>{
-        const arr = [];
-        snap.forEach(docu=> arr.push({ id: docu.id, ...docu.data() }));
-        renderHomeworks(arr);
-        renderAdminList(arr);
-        countHW.textContent = arr.length;
-        if(arr.length > lastHwCount){
-          notif.classList.remove('hide'); notif.textContent = (arr.length - lastHwCount);
-        }
-      });
-    }
+    guestBtn.addEventListener('click', ()=>{
+      // Guest goes to student page; no auth
+      window.location.href = 'student.html?guest=1';
+    });
 
-    // render student view
-    function renderHomeworks(arr){
-      hwList.innerHTML = '';
-      if(arr.length === 0){
-        hwList.innerHTML = '<div class="small">No homework yet</div>';
-        return;
-      }
-      const now = new Date();
-      arr.forEach(hw=>{
-        const d = new Date(hw.due + 'T23:59:59');
-        const diff = Math.ceil((d - now)/(1000*60*60*24));
-        const days = diff > 0 ? `${diff} day${diff>1?'s':''} left` : 'Due today / overdue';
-        const div = document.createElement('div'); div.className='hw';
-        div.innerHTML = `<h3>${escapeHtml(hw.title)} ✨</h3>
-                         <div class="desc">${escapeHtml(hw.desc)}</div>
-                         <div class="meta"><div>Due: ${escapeHtml(hw.due||'N/A')}</div><div>${escapeHtml(days)}</div></div>`;
-        hwList.appendChild(div);
-      });
-    }
-
-    // render admin list with edit/delete
-    function renderAdminList(arr){
-      adminHwList.innerHTML = '';
-      if(!(currentRole === 'teacher' || currentRole === 'admin')) return;
-      if(arr.length===0){ adminHwList.innerHTML = '<div class="small">No homeworks</div>'; return; }
-      arr.forEach(hw=>{
-        const w = document.createElement('div'); w.className='hw';
-        w.style.display='flex'; w.style.flexDirection='column';
-        w.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-                         <div style="font-weight:700;color:#7a1030">${escapeHtml(hw.title)}</div>
-                         <div>
-                           <button class="btn ghost tiny" data-id="${hw.id}" data-act="edit">Edit</button>
-                           <button class="btn ghost tiny" data-id="${hw.id}" data-act="del">Delete</button>
-                         </div>
-                       </div>
-                       <div style="color:#6b2a3f;font-size:13px">${escapeHtml(hw.desc)}</div>
-                       <div style="display:flex;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:12px">
-                        <div>Due: ${escapeHtml(hw.due||'N/A')}</div>
-                        <div>Posted: ${new Date(hw.createdAt?.toDate ? hw.createdAt.toDate() : hw.createdAt).toLocaleString()}</div>
-                       </div>`;
-        adminHwList.appendChild(w);
-
-        Array.from(w.querySelectorAll('button')).forEach(btn=>{
-          btn.addEventListener('click', async (e)=>{
-            const id = btn.getAttribute('data-id');
-            const act = btn.getAttribute('data-act');
-            if(act === 'del'){
-              if(confirm('Delete this homework?')){
-                await deleteDoc(doc(db,'homeworks', id));
-              }
-            } else if(act === 'edit'){
-              // load values into form, delete doc so post acts as update
-              const d = arr.find(x => x.id === id);
-              if(d){ hwTitle.value = d.title; hwDesc.value = d.desc; hwDue.value = d.due || ''; hwMsg.textContent='Editing (will replace)'; await deleteDoc(doc(db,'homeworks', id)); }
-            }
-          });
-        });
-      });
-    }
-
-    // attendance count subscription
-    function subscribeAttendanceCount(){
-      const col = collection(db,'attendance');
-      onSnapshot(col, snap=>{
-        let c = 0; const arr = [];
-        snap.forEach(s=>{ arr.push(s.data()); c++; });
-        countAttend.textContent = c;
-        if(currentRole === 'student') {
-          if(c >= 3) document.getElementById('activity').textContent = `You joined ${c} classes — great job! 🎉`;
-          else document.getElementById('activity').textContent = `You joined ${c} classes.`;
-        }
-      });
-    }
-
-    // ---------- Actions: Post homework, export attendance ----------
-    btnPost.onclick = async ()=>{
-      if(!(currentRole === 'teacher' || currentRole === 'admin')){ alert('Only teacher can post'); return; }
-      const title = hwTitle.value.trim(); const desc = hwDesc.value.trim(); const due = hwDue.value;
-      if(!title || !desc || !due){ hwMsg.style.color='#a1223f'; hwMsg.textContent='All fields required'; return; }
-      const payload = { title, desc, due, createdAt: serverTimestamp(), createdBy: currentUser?.email || 'teacher' };
+    createBtn.addEventListener('click', async ()=>{
+      const email = regEmail.value.trim(); const pass = regPass.value;
+      if(!email || !pass){ alert('Email & password required'); return; }
       try{
-        await addDoc(collection(db,'homeworks'), payload);
-        hwMsg.style.color='#2b6a4f'; hwMsg.textContent='Posted ✨';
-        hwTitle.value=''; hwDesc.value=''; hwDue.value='';
-        setTimeout(()=>hwMsg.textContent='',1800);
-      }catch(e){ hwMsg.style.color='#a1223f'; hwMsg.textContent = e.message; }
-    };
+        await createUserWithEmailAndPassword(auth, email, pass);
+        // default role document to student
+        await setDoc(doc(db, 'roles', email), { role: 'student' });
+        alert('Account created and role set to student. You can now sign in.');
+        regEmail.value=''; regPass.value='';
+      }catch(e){ alert(e.message); }
+    });
 
-    btnClear.onclick = ()=>{ hwTitle.value=''; hwDesc.value=''; hwDue.value=''; hwMsg.textContent=''; };
-
-    // export attendance CSV
-    document.getElementById('btnExport').onclick = async ()=>{
-      const snap = await getDocs(collection(db,'attendance'));
-      if(snap.empty){ alert('No attendance data'); return; }
-      const rows = [['Name','Time']];
-      snap.forEach(s=>{ const v = s.data(); rows.push([v.name, v.time]); });
-      const csv = rows.map(r=> r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-      const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob); const a=document.createElement('a');
-      a.href=url; a.download='attendance.csv'; a.click(); URL.revokeObjectURL(url);
-    };
-
-    // Zoom join action: write attendance then open zoom
-    btnZoom.onclick = async ()=>{
-      const name = currentUser?.email || 'guest';
-      const now = new Date().toLocaleString();
-      // write to firestore attendance collection
-      try{
-        await addDoc(collection(db,'attendance'), { name, time: now });
-      }catch(e){}
-      launchConfetti();
-      window.open(ZOOM_LINK,'_blank');
-    };
-
-    // ---------- Show dashboard UI after login/guest ----------
-    function showDashboard(){
-      loginBox.classList.add('hide');
-      dashboardUI.classList.remove('hide');
-      // user area (top-right)
-      userArea.innerHTML = `<div style="text-align:right"><div style="font-weight:700">Hello ${escapeHtml((currentUser?.email||'Guest').split('@')[0])} 👑</div><div class="small">${escapeHtml(currentUser?.email||'guest@local')}</div></div>`;
-      welcomeTitle.textContent = (currentRole === 'teacher' || currentRole === 'admin') ? 'Teacher Dashboard' : 'Welcome Princess';
-      welcomeSub.textContent = (currentRole === 'teacher' || currentRole === 'admin') ? 'Manage homeworks & attendances' : 'Prepare, have fun & shine ✨';
-      // show admin panel if teacher
-      adminPanel.style.display = (currentRole === 'teacher' || currentRole === 'admin') ? 'block' : 'none';
-      // set last seen count baseline
-      getDocs(collection(db,'homeworks')).then(snap=>{
-        lastHwCount = snap.size;
-      }).catch(()=>{ lastHwCount = 0; });
-    }
-
-    // ---------- Utility imports used above (getDoc/deleteDoc...) ----------
-    // Lazy helpers loaded earlier via dynamic import when needed (we used getDocs/addDoc/onSnapshot etc already)
-
-    // ---------- Manual instructions (you must do these in Firebase Console) ----------
-    // 1) In Firestore Console -> create collection "roles" and documents:
-    //    Document ID: teacher@codingclass.com  -> { role: "teacher" }
-    //    Document ID: ghadah@codingclass.com   -> { role: "student" }
-    //
-    // 2) In Firebase Console -> Authentication -> enable Email/Password sign-in (you already did)
-    //
-    // 3) In Firebase Console -> Authentication -> add users (teacher@codingclass.com, ghadah@codingclass.com) OR use "Create account" in the UI
-    //
-    // 4) In Firebase Console -> Firestore -> Rules: set rules to permit read to signed-in users and write for teacher only (I provided a rules snippet earlier)
-    //
-    // After you create the role documents and users, sign in with teacher to see admin panel.
-    // When done, tell me "done ✅" and I will:
-    //  - verify the role read flow
-    //  - help you adjust Firestore rules if needed
-    //  - optionally push this file into your GitHub repo for you
-
-    // ---------- small helper to use deleteDoc/doc/getDocs etc which we referenced earlier ----------
-    // dynamic references were used in event handlers; ensure these are available
-    import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js').then(mod=>{
-      window._fire_mod = mod; // for debug
-      // wire the functions used by handlers
-      window.doc = mod.doc;
-      window.deleteDoc = mod.deleteDoc;
-      window.getDocs = mod.getDocs;
-      window.addDoc = mod.addDoc;
-      window.query = mod.query;
-      window.collection = mod.collection;
-      window.serverTimestamp = mod.serverTimestamp;
-      window.onSnapshot = mod.onSnapshot;
-      window.orderBy = mod.orderBy;
-    }).catch(e=>console.warn('firestore import failed', e));
-
+    clearReg.addEventListener('click', ()=>{ regEmail.value=''; regPass.value=''; });
   </script>
 </body>
 </html>

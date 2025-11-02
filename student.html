@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Student — Ghadah Classroom</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Quicksand',system-ui;margin:0;background:linear-gradient(180deg,#fff0f9,#fff7fb);padding:20px}
+    .wrap{max-width:920px;margin:0 auto}
+    header{display:flex;justify-content:space-between;align-items:center}
+    .card{background:#fff;border-radius:12px;padding:14px;margin-top:12px;box-shadow:0 8px 30px rgba(0,0,0,0.06)}
+    .btn{padding:10px 12px;border-radius:10px;border:0;background:linear-gradient(180deg,#ff66b3,#ff4d9a);color:#fff;font-weight:700;cursor:pointer}
+    .hw-list{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow:auto;margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1 style="margin:0;color:#b02b6b">Student Dashboard</h1>
+        <div class="small">Ghadah — Mon/Tue/Wed 5:30 PM (KSA)</div>
+      </div>
+      <div>
+        <button class="btn" id="logout">Sign out</button>
+      </div>
+    </header>
+
+    <div class="card">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div>
+          <h3 style="margin:0" id="greet">Hello Princess</h3>
+          <div class="small" id="emailView">guest</div>
+        </div>
+        <div style="margin-left:auto">
+          <button class="btn" id="joinZoom">Join Zoom</button>
+        </div>
+      </div>
+
+      <h3 style="margin-top:12px">Homework</h3>
+      <div class="hw-list" id="hwList"></div>
+
+      <div style="margin-top:12px">
+        <h4 style="margin:0">Activity</h4>
+        <div class="small" id="activity">No events yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { collection, query, orderBy, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    const hwList = document.getElementById('hwList');
+    const greet = document.getElementById('greet');
+    const emailView = document.getElementById('emailView');
+    const activity = document.getElementById('activity');
+    const joinZoom = document.getElementById('joinZoom');
+    const logoutBtn = document.getElementById('logout');
+
+    // Zoom link (you gave this)
+    const ZOOM_LINK = "https://us05web.zoom.us/j/84952905958?pwd=mp92Dd0kz6LWzxfxUzCY0UsNEUzGZ4.1";
+
+    // Auth check - show student only
+    auth.onAuthStateChanged(async (u)=>{
+      if(u){
+        // check role
+        const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+        const r = await getDoc(doc(db,'roles', u.email));
+        const role = r.exists() && r.data().role ? r.data().role : 'student';
+        if(role === 'teacher' || role === 'admin'){
+          // teacher accidentally logged in — redirect to admin
+          window.location.href = 'admin.html';
+          return;
+        }
+        greet.textContent = `Hello ${u.email.split('@')[0]} 👑`;
+        emailView.textContent = u.email;
+        subscribeHomeworks();
+      } else {
+        // allow guest view (if student opened by guest link)
+        const params = new URLSearchParams(window.location.search);
+        if(params.get('guest')){
+          greet.textContent = 'Hello Guest 👑';
+          emailView.textContent = 'guest@local';
+          subscribeHomeworks();
+          return;
+        }
+        // not logged in -> send to login
+        window.location.href = 'index.html';
+      }
+    });
+
+    // subscribe homeworks
+    function subscribeHomeworks(){
+      const q = query(collection(db,'homeworks'), orderBy('createdAt','desc'));
+      onSnapshot(q, snap=>{
+        hwList.innerHTML = '';
+        if(snap.empty) { hwList.innerHTML = '<div class="small">No homework yet</div>'; return; }
+        snap.forEach(s=>{
+          const h = s.data();
+          const due = h.due || 'N/A';
+          const created = h.createdAt && h.createdAt.toDate ? h.createdAt.toDate().toLocaleString() : (h.createdAt ? new Date(h.createdAt).toLocaleString(): '');
+          const div = document.createElement('div'); div.className='hw';
+          div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700">${escapeHtml(h.title)}</div><div class="small">${escapeHtml(due)}</div></div><div style="margin-top:6px;color:#6b2a3f">${escapeHtml(h.desc)}</div><div style="margin-top:6px;font-size:12px;color:#7b6b7a">Posted: ${created}</div>`;
+          hwList.appendChild(div);
+        });
+      });
+    }
+
+    // join zoom - record attendance then open zoom
+    joinZoom.addEventListener('click', async ()=>{
+      const user = auth.currentUser;
+      const name = user ? user.email : 'guest';
+      const now = new Date().toLocaleString();
+      try{
+        await addDoc(collection(db,'attendance'), { name, time: now, classDay: new Date().toISOString().slice(0,10) });
+      }catch(e){}
+      activity.textContent = `${name} joined Zoom at ${now}`;
+      // confetti? simple visual
+      window.open(ZOOM_LINK,'_blank');
+    });
+
+    logoutBtn.addEventListener('click', async ()=>{ await signOut(auth); window.location.href='index.html'; });
+
+    function escapeHtml(s){ if(s==null) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;"); }
+  </script>
+</body>
+</html>
