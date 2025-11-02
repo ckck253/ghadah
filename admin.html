@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Teacher — Ghadah Classroom</title>
+  <title>Teacher — dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body{font-family:'Quicksand',system-ui;margin:0;background:linear-gradient(180deg,#fff0f9,#fff7fb);padding:20px}
@@ -196,33 +196,7 @@
 
     // init function executed after auth guard passed
     function init(){ /* nothing else needed here; listeners are active */ }
-    function joinZoom() {
-  if (!auth.currentUser) {
-    alert("You must be logged in!");
-    return;
-  }
 
-  const user = auth.currentUser.email;
-  const now = new Date().toLocaleString();
-
-  // Save attendance in Firestore
-  db.collection("attendance").add({
-    name: user,
-    time: now
-  })
-  .then(() => {
-    console.log("Attendance saved for:", user);
-
-    // ✅ Open Zoom Meeting
-    window.open(
-      "https://us05web.zoom.us/j/84952905958?pwd=mp92Dd0kz6LWzxfxUzCY0UsNEUzGZ4.1",
-      "_blank"
-    );
-  })
-  .catch(error => {
-    console.error("Error saving attendance:", error);
-    alert("Attendance error: " + error.message);
-  });
 }
 
   </script>
